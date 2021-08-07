@@ -170,25 +170,6 @@ be able to have the curve start above x = 0, by adding on the starting height to
 '''
 
 
-# takes in suvat,svt and returns lists of x and y coords
-def para_hor_ver_arr(suvat, svt):
-    # unpack the lists into their respective variables
-    sy, uy, vy, ay, ty = suvat
-    sx, vx, tx = svt
-    # create coords
-    return para_create_coords_lists(uy, ay, vx)
-
-
-# takes in given parameters and returns lists of x and y coords
-def para_vel_angle_arr(velocity, angle, acceleration):
-    # calculate the hor, ver components of velocity using trigonometry
-    vx = float(velocity * np.cos(angle / 180 * np.pi))
-    ay = acceleration
-    uy = float(velocity * np.sin(angle / 180 * np.pi))
-    # call the create list function
-    return para_create_coords_lists(uy, ay, vx)
-
-
 def para_create_coords_lists(uy, ay, vx):
     # find the number of seconds for which the projectile is in the air to find last point
     max = 2 * uy / -ay
@@ -207,6 +188,25 @@ def para_create_coords_lists(uy, ay, vx):
         y_coords.append(y[0])
     # return the 2 coord lists
     return x_coords, y_coords
+
+
+# takes in suvat,svt and returns lists of x and y coords
+def para_hor_ver_arr(suvat, svt):
+    # unpack the lists into their respective variables
+    sy, uy, vy, ay, ty = suvat
+    sx, vx, tx = svt
+    # create coords
+    return para_create_coords_lists(uy, ay, vx)
+
+
+# takes in given parameters and returns lists of x and y coords
+def para_vel_angle_arr(velocity, angle, acceleration):
+    # calculate the hor, ver components of velocity using trigonometry
+    vx = float(velocity * np.cos(angle / 180 * np.pi))
+    ay = acceleration
+    uy = float(velocity * np.sin(angle / 180 * np.pi))
+    # call the create list function
+    return para_create_coords_lists(uy, ay, vx)
 
 
 # uses matplotlib.pyplot as plt to plot the graph with given coords
@@ -272,9 +272,9 @@ def find_v(values):
     if v is None:
         # call the svt function, with v being the target variable
         v = svt_equation(s, v, t, 'v')[0]
-
     # return the list of svt values
     return [s, v, t]
+
 
 # to find how many unknown suvat variables there are (will be used in validation)
 def how_many_suvat_variables(s, u, v, a, t):
@@ -290,21 +290,28 @@ def how_many_suvat_variables(s, u, v, a, t):
     return 5 - none
 
 
-print(find_sua(([1, '', -10, '', 3])))
-print(find_v([2, '', 2/3]))
+def graph_main(values_suvat, values_svt):
+    # if uy and ay are unknown
+    if values_suvat[1] == '' or values_suvat[3] == '':
+        # find the unknown values needed to plot curve
+        values_suvat = find_sua(values_suvat)
+    # if vx is unknown
+    if values_svt[1] == '':
+        # find v
+        values_svt = find_v(values_svt)
+
+    coords = para_hor_ver_arr(values_suvat, values_svt)
+    plot_graph(coords[0], coords[1])
+    return coords
+
+
+graph_main([1, '', -10, '', 3], [2, '', 2 / 3])
+
+# print(find_sua(([1, '', -10, '', 3])))
+# print(find_v([2, '', 2/3]))
+
 
 '''
-make it so any inputted set of suvat svt can be created into a graph - plot'
+make it so any inputted set of suvat svt can be created into a graph - plot
 use cartesian equations for vel angle acceleration
 '''
-
-
-
-
-
-
-
-
-
-
-
