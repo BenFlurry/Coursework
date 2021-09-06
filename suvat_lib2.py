@@ -290,7 +290,7 @@ def how_many_suvat_variables(s, u, v, a, t):
     return 5 - none
 
 
-def graph_main(values_suvat, values_svt):
+def graph_main_suvat(values_suvat, values_svt):
     # if uy and ay are unknown
     if values_suvat[1] == '' or values_suvat[3] == '':
         # find the unknown values needed to plot curve
@@ -304,8 +304,14 @@ def graph_main(values_suvat, values_svt):
     plot_graph(coords[0], coords[1])
     return coords
 
+def graph_main_velangle(vel, angle):
+    pass
+    '''
+    use angle velocity formula to find x and y as t increases
+    '''
 
-graph_main([1, '', -10, '', 3], [2, '', 2 / 3])
+
+graph_main_suvat([1, '', -10, '', 3], [2, '', 2 / 3])
 
 # print(find_sua(([1, '', -10, '', 3])))
 # print(find_v([2, '', 2/3]))
