@@ -77,6 +77,8 @@ def suvt(s, u, v, t, to_be_found):
 
 # HORIZONTAL COMPONENT
 '''asd'''
+
+
 # 6: s = vt
 def svt_equation(s, v, t, to_be_found):
     if to_be_found == 's':
@@ -304,12 +306,6 @@ def graph_main_suvat(values_suvat, values_svt):
     plot_graph(coords[0], coords[1])
     return coords
 
-def graph_main_velangle(vel, angle):
-    pass
-    '''
-    use angle velocity formula to find x and y as t increases
-    '''
-
 
 graph_main_suvat([1, '', -10, '', 3], [2, '', 2 / 3])
 
@@ -321,3 +317,42 @@ graph_main_suvat([1, '', -10, '', 3], [2, '', 2 / 3])
 make it so any inputted set of suvat svt can be created into a graph - plot
 use cartesian equations for vel angle acceleration
 '''
+
+
+# equation to take in x, velocity angle, acceleration and start height and return the y value for each x passed in
+def vel_angle_eqn(x, velocity, angle, acceleration, start_height):
+    # equation to find y with respect to x
+    y = (np.tan(angle) * x) + ((acceleration * x ** 2) / (2 * velocity ** 2 * (np.cos(angle) ** 2))) + start_height
+    return y
+
+
+# finds when projectile hits the ground
+# NOT WORKING
+def vel_angle_x_intercept(velocity, angle, acceleration, start_height):
+    a = acceleration / (2 * velocity ** 2 * (np.cos(angle)) ** 2)
+    b = np.tan(angle)
+    c = 0
+    roots = (np.roots([a, b, c]))
+    print(roots)
+    return np.maximum(roots[0], roots[1])
+
+
+# takes in vel, angle, acceleration, start height and plots the graph
+def graph_main_velangle(velocity, angle, acceleration, start_height):
+    # convert angle from degrees to radians
+    angle = angle * np.pi / 180
+    '''
+    find stop coords using np.roots(a, b, c) of the quadratic values for when y = -start_height
+    '''
+
+    # create set of x values
+    x_coords = np.arange(0, 10, 0.01)
+    # find the y values respective to x values
+    y_coords = vel_angle_eqn(x_coords, velocity, angle, acceleration, start_height)
+    # plot the x and y coordinates and show graph
+    plt.plot(x_coords, y_coords)
+    plt.show()
+
+
+# graph_main_velangle(5, 30, -10, 2)
+print(vel_angle_x_intercept(10, 10, -10, 0))
