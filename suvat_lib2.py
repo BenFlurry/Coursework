@@ -307,7 +307,7 @@ def graph_main_suvat(values_suvat, values_svt):
     return coords
 
 
-graph_main_suvat([1, '', -10, '', 3], [2, '', 2 / 3])
+# graph_main_suvat([1, '', -10, '', 3], [2, '', 2 / 3])
 
 # print(find_sua(([1, '', -10, '', 3])))
 # print(find_v([2, '', 2/3]))
@@ -327,13 +327,14 @@ def vel_angle_eqn(x, velocity, angle, acceleration, start_height):
 
 
 # finds when projectile hits the ground
-# NOT WORKING
 def vel_angle_x_intercept(velocity, angle, acceleration, start_height):
-    a = acceleration / (2 * velocity ** 2 * (np.cos(angle)) ** 2)
+    # take the ax^2 + bx + c coefficients
+    a = acceleration / (2 * (velocity ** 2) * ((np.cos(angle)) ** 2))
     b = np.tan(angle)
-    c = 0
+    c = start_height
+    # find roots
     roots = (np.roots([a, b, c]))
-    print(roots)
+    # return as tuple
     return np.maximum(roots[0], roots[1])
 
 
@@ -341,12 +342,10 @@ def vel_angle_x_intercept(velocity, angle, acceleration, start_height):
 def graph_main_velangle(velocity, angle, acceleration, start_height):
     # convert angle from degrees to radians
     angle = angle * np.pi / 180
-    '''
-    find stop coords using np.roots(a, b, c) of the quadratic values for when y = -start_height
-    '''
-
-    # create set of x values
-    x_coords = np.arange(0, 10, 0.01)
+    # find where the projectile hits the ground to find end point of projectile curve
+    end = vel_angle_x_intercept(velocity, angle, acceleration, start_height)
+    # create set of x values from 0 to the end value
+    x_coords = np.arange(0, end, 0.01)
     # find the y values respective to x values
     y_coords = vel_angle_eqn(x_coords, velocity, angle, acceleration, start_height)
     # plot the x and y coordinates and show graph
@@ -355,4 +354,6 @@ def graph_main_velangle(velocity, angle, acceleration, start_height):
 
 
 # graph_main_velangle(5, 30, -10, 2)
-print(vel_angle_x_intercept(10, 10, -10, 0))
+print(graph_main_velangle(20, 45, -10, 10))
+
+
