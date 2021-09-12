@@ -353,7 +353,23 @@ def graph_main_velangle(velocity, angle, acceleration, start_height):
     plt.show()
 
 
-# graph_main_velangle(5, 30, -10, 2)
-print(graph_main_velangle(20, 45, -10, 10))
+# finds theta given x,y,u,a,start height
+def find_theta(x, y, velocity, acceleration, start_height):
+    # make graph start at (0,0)
+    y = y - start_height
+    # find abc coefficients of atheta^2 + btheta + c = 0
+    a = (-acceleration * x**2) / (2 * velocity**2)
+    b = -x
+    c = (-acceleration * x**2) / (2 * velocity**2) + y
+    # find tan theta roots
+    print(a,b,c)
+    tan_theta = np.array(np.roots([a, b, c]))
+    print(tan_theta)
+    # convert to degrees from radians and wrap as tuple
+    theta = tuple((180 / np.pi) * np.arctan(tan_theta))
+    # return theta possibilities
+    return theta
 
 
+print(graph_main_velangle(20, 45, -10, 20))
+print(find_theta(40, 20, 20, -10, 20))
