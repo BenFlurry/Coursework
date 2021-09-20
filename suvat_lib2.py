@@ -362,9 +362,7 @@ def find_theta(x, y, velocity, acceleration, start_height):
     b = -x
     c = (-acceleration * x**2) / (2 * velocity**2) + y
     # find tan theta roots
-    print(a,b,c)
     tan_theta = np.array(np.roots([a, b, c]))
-    print(tan_theta)
     # convert to degrees from radians and wrap as tuple
     theta = tuple((180 / np.pi) * np.arctan(tan_theta))
     # return theta possibilities
