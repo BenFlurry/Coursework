@@ -4,7 +4,6 @@ import string
 
 
 # VERTICAL COMPONENT
-
 # 1: s = ut + 0.5at^2
 def suat(s, u, a, t, to_be_found):
     if to_be_found == 's':
@@ -76,9 +75,6 @@ def suvt(s, u, v, t, to_be_found):
 
 
 # HORIZONTAL COMPONENT
-'''asd'''
-
-
 # 6: s = vt
 def svt_equation(s, v, t, to_be_found):
     if to_be_found == 's':
@@ -135,10 +131,6 @@ def choose_suvat_eqn(s, u, v, a, t, to_be_found):
 
 
 def svt(values):
-    """
-    :param values list:
-    :return tuple:
-    """
     # iterate through the 3 list indexes
     for i in range(3):
         # check for unknown value as inputted as '?'
@@ -164,12 +156,6 @@ def svt(values):
 
     # pass the variables, and target variable into the svt equation, and return the result
     return svt_equation(s, v, t, to_be_found)
-
-
-'''
-use a while loop until the x coord is less than 0, then add the x = 0 to the list
-be able to have the curve start above x = 0, by adding on the starting height to each y coord
-'''
 
 
 def para_create_coords_lists(uy, ay, vx):
@@ -213,10 +199,6 @@ def para_vel_angle_arr(velocity, angle, acceleration):
 
 # uses matplotlib.pyplot as plt to plot the graph with given coords
 def plot_graph(x_coords, y_coords):
-    """
-    :type x_coords: list
-    :type y_coords: list
-    """
     plt.plot(x_coords, y_coords)
     plt.show()
 
@@ -307,18 +289,6 @@ def graph_main_suvat(values_suvat, values_svt):
     return coords
 
 
-# graph_main_suvat([1, '', -10, '', 3], [2, '', 2 / 3])
-
-# print(find_sua(([1, '', -10, '', 3])))
-# print(find_v([2, '', 2/3]))
-
-
-'''
-make it so any inputted set of suvat svt can be created into a graph - plot
-use cartesian equations for vel angle acceleration
-'''
-
-
 # equation to take in x, velocity angle, acceleration and start height and return the y value for each x passed in
 def vel_angle_eqn(x, velocity, angle, acceleration, start_height):
     # equation to find y with respect to x
@@ -369,5 +339,3 @@ def find_theta(x, y, velocity, acceleration, start_height):
     return theta
 
 
-print(graph_main_velangle(20, 45, -10, 20))
-print(find_theta(40, 20, 20, -10, 20))
