@@ -5,7 +5,6 @@ from suvat_lib2 import *
 
 ui = uic.loadUiType('suvatcalculator.ui')[0]
 
-
 class CalculateSuvatWindow(QMainWindow, ui):
     def __init__(self, app_window):
         super().__init__()
@@ -16,22 +15,15 @@ class CalculateSuvatWindow(QMainWindow, ui):
 
     def pull_values(self):
         # pull values from PyQt
-        # y values
-        sy = int(self.sy.text())
-        uy = int(self.uy.text())
-        vy = int(self.vy.text())
-        ay = int(self.ay.text())
-        ty = int(self.ty.text())
-        suvat = [sy, uy, vy, ay, ty]
-        # x values
-        sx = int(self.sx.text())
-        vx = int(self.vx.text())
-        tx = int(self.tx.text())
-        svt = [sx, vx, tx]
-        # return valuables
-        return suvat, svt
+        self.start_height = self.sh.text()
+        self.values_suvat = [self.sy.text(), self.uy.text(), self.vy.text(), self.ay.text(), self.ty.text()]
+        self.values_svt = [self.sx.text(), self.vx.text(), self.tx.text()]
+
 
     def calculate_values(self):
-        suvat, svt = self.pull_values()
-        graph_main_suvat(suvat, svt)
+        # take pulled values
+        self.pull_values()
+        # run the main function from suvat library
+        graph_main_suvat(self.values_suvat, self.values_svt, self.start_height)
+
 

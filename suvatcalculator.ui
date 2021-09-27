@@ -69,7 +69,11 @@
      <rect>
       <x>80</x>
       <y>120</y>
+<<<<<<< HEAD
       <width>61</width>
+=======
+      <width>71</width>
+>>>>>>> origin/main
       <height>21</height>
      </rect>
     </property>
@@ -100,7 +104,11 @@
      </rect>
     </property>
     <property name="text">
+<<<<<<< HEAD
      <string>FInal Velocity</string>
+=======
+     <string>Final Velocity</string>
+>>>>>>> origin/main
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
@@ -134,7 +142,11 @@
      <rect>
       <x>160</x>
       <y>40</y>
+<<<<<<< HEAD
       <width>91</width>
+=======
+      <width>101</width>
+>>>>>>> origin/main
       <height>31</height>
      </rect>
     </property>
@@ -170,7 +182,11 @@
      <rect>
       <x>450</x>
       <y>110</y>
+<<<<<<< HEAD
       <width>61</width>
+=======
+      <width>71</width>
+>>>>>>> origin/main
       <height>21</height>
      </rect>
     </property>
@@ -237,6 +253,32 @@
      <string>Calculate</string>
     </property>
    </widget>
+<<<<<<< HEAD
+=======
+   <widget class="QLabel" name="label_11">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>330</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Start Height</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="sh">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>330</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+>>>>>>> origin/main
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

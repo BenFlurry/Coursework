@@ -158,33 +158,41 @@ def svt(values):
     return svt_equation(s, v, t, to_be_found)
 
 
-def para_create_coords_lists(uy, ay, vx):
-    # find the number of seconds for which the projectile is in the air to find last point
-    max = 2 * uy / -ay
+def para_create_coords_lists(uy, ay, vx, start_height):
+    # convert inputs to integers
+    uy = int(uy)
+    ay = int(ay)
+    vx = int(vx)
+    start_height = int(start_height)
     # create the x,y coords lists
     x_coords = []
     y_coords = []
     # find x,y coords and add to list
-    # max * 100 so one point is recorded every 0.01s to make curve smoother
-    for t in range(int(max * 100 + 1)):
+    # set t and y to 0
+    t = 0
+    y = 0
+    # iterate through value of t, until projectile hits ground (y = 0)
+    while y >= 0:
         # call the suat function to find y coord at t time
-        y = suat(0, uy, ay, t / 100, 's')
+        y = suat(0, uy, ay, t, 's')[0] + start_height
         # call svt function to find x coord at t time
-        x = svt_equation(0, vx, t / 100, 's')
+        x = svt_equation(0, vx, t, 's')[0]
         # add coords to their respective lists
-        x_coords.append(x[0])
-        y_coords.append(y[0])
+        x_coords.append(x)
+        y_coords.append(y)
+        # increment t
+        t += 0.01
     # return the 2 coord lists
     return x_coords, y_coords
 
 
 # takes in suvat,svt and returns lists of x and y coords
-def para_hor_ver_arr(suvat, svt):
+def para_hor_ver_arr(suvat, svt, start_height):
     # unpack the lists into their respective variables
     sy, uy, vy, ay, ty = suvat
     sx, vx, tx = svt
     # create coords
-    return para_create_coords_lists(uy, ay, vx)
+    return para_create_coords_lists(uy, ay, vx, start_height)
 
 
 # takes in given parameters and returns lists of x and y coords
@@ -209,6 +217,8 @@ def find_sua(values):
     for i in range(5):
         if values[i] == '':
             values[i] = None
+        else:
+            values[i] = int(values[i])
 
     # unpack the list
     s, u, v, a, t = values
@@ -250,6 +260,8 @@ def find_v(values):
     for i in range(3):
         if values[i] == '':
             values[i] = None
+        else:
+            values[i] = int(values[i])
     # unpack the list
     s, v, t = values
     # if v is unknown, call the equation
@@ -274,7 +286,7 @@ def how_many_suvat_variables(s, u, v, a, t):
     return 5 - none
 
 
-def graph_main_suvat(values_suvat, values_svt):
+def graph_main_suvat(values_suvat, values_svt, start_height):
     # if uy and ay are unknown
     if values_suvat[1] == '' or values_suvat[3] == '':
         # find the unknown values needed to plot curve
@@ -283,8 +295,8 @@ def graph_main_suvat(values_suvat, values_svt):
     if values_svt[1] == '':
         # find v
         values_svt = find_v(values_svt)
-
-    coords = para_hor_ver_arr(values_suvat, values_svt)
+    # create list of coords
+    coords = para_hor_ver_arr(values_suvat, values_svt, start_height)
     plot_graph(coords[0], coords[1])
     return coords
 
@@ -309,7 +321,9 @@ def vel_angle_x_intercept(velocity, angle, acceleration, start_height):
 
 
 # takes in vel, angle, acceleration, start height and plots the graph
-def graph_main_velangle(velocity, angle, acceleration, start_height):
+def graph_main_velangle(velocity, angle, acceleration, start_height, x, y):
+    if angle == '':
+        angle = find_theta(x, y, velocity, acceleration, start_height)
     # convert angle from degrees to radians
     angle = angle * np.pi / 180
     # find where the projectile hits the ground to find end point of projectile curve
@@ -337,5 +351,6 @@ def find_theta(x, y, velocity, acceleration, start_height):
     theta = tuple((180 / np.pi) * np.arctan(tan_theta))
     # return theta possibilities
     return theta
+
 
 
