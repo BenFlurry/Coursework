@@ -27,18 +27,19 @@ class CalculateVelAngleWindow(QMainWindow, ui):
         self.pull_values()
         # check we can run the main function, create an array where 1 means value and 0 means missing value
         value_exists = []
-        for value in self.values:
+        for i in range(len(self.values)):
             # if the value exists, append 1, else append 0
-            if value == '':
+            if self.values[i] == '':
                 value_exists.append(0)
             else:
                 value_exists.append(1)
+                self.values[i] = int(self.values[i])
 
         # unpack the list
         vel, ang, acc, sh, x, y = self.values
 
         # if there are the correct permuations of values, run the main velangle function
-        if value_exists == [0, 0, 0, 0, 1, 1] or value_exists == [1, 1, 1, 1, 0, 0]:
+        if value_exists == [1, 0, 1, 1, 1, 1] or value_exists == [1, 1, 1, 1, 0, 0]:
             graph_main_velangle(vel, ang, acc, sh, x, y)
 
 '''

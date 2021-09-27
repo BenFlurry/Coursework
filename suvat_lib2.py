@@ -324,27 +324,47 @@ def vel_angle_x_intercept(velocity, angle, acceleration, start_height):
 def graph_main_velangle(velocity, angle, acceleration, start_height, x, y):
     if angle == '':
         angle = find_theta(x, y, velocity, acceleration, start_height)
-    # convert angle from degrees to radians
-    angle = angle * np.pi / 180
-    # find where the projectile hits the ground to find end point of projectile curve
-    end = vel_angle_x_intercept(velocity, angle, acceleration, start_height)
-    # create set of x values from 0 to the end value
-    x_coords = np.arange(0, end, 0.01)
-    # find the y values respective to x values
-    y_coords = vel_angle_eqn(x_coords, velocity, angle, acceleration, start_height)
-    # plot the x and y coordinates and show graph
-    plt.plot(x_coords, y_coords)
-    plt.show()
+        print(angle[0], angle[1])
+        # convert angle from degrees to radians
+        angle1 = angle[0] * np.pi / 180
+        angle2 = angle[1] * np.pi / 180
+        # find where the projectile hits the ground to find end point of projectile curve
+        end = vel_angle_x_intercept(velocity, angle1, acceleration, start_height)
+        # create set of x values from 0 to the end value
+        x_coords = np.arange(0, end, 0.01)
+        # find the y values respective to x values
+        y_coords1 = vel_angle_eqn(x_coords, velocity, angle1, acceleration, start_height)
+        y_coords2 = vel_angle_eqn(x_coords, velocity, angle2, acceleration, start_height)
+        # plot the x and y coordinates and show graph
+        plt.plot(x_coords, y_coords1)
+        plt.plot(x_coords, y_coords2)
+        plt.show()
+
+    else:
+        # convert angle from degrees to radians
+        angle = angle * np.pi / 180
+        # find where the projectile hits the ground to find end point of projectile curve
+        end = vel_angle_x_intercept(velocity, angle, acceleration, start_height)
+        # create set of x values from 0 to the end value
+        x_coords = np.arange(0, end, 0.01)
+        # find the y values respective to x values
+        y_coords = vel_angle_eqn(x_coords, velocity, angle, acceleration, start_height)
+        # plot the x and y coordinates and show graph
+        plt.plot(x_coords, y_coords)
+        plt.show()
 
 
 # finds theta given x,y,u,a,start height
 def find_theta(x, y, velocity, acceleration, start_height):
+    print(x, y, velocity, acceleration, start_height)
     # make graph start at (0,0)
     y = y - start_height
     # find abc coefficients of atheta^2 + btheta + c = 0
-    a = (-acceleration * x**2) / (2 * velocity**2)
+    a = ((-acceleration) * (x**2)) / (2 * (velocity**2))
     b = -x
-    c = (-acceleration * x**2) / (2 * velocity**2) + y
+    c = ((-acceleration) * (x**2)) / (2 * (velocity**2)) + y
+
+    print(b**2 - (4*a*c))
     # find tan theta roots
     tan_theta = np.array(np.roots([a, b, c]))
     # convert to degrees from radians and wrap as tuple
