@@ -331,16 +331,15 @@ def graph_main_velangle(velocity, angle, acceleration, start_height, x, y):
         # find where the projectile hits the ground to find end point of projectile curve
         end1 = vel_angle_x_intercept(velocity, angle1, acceleration, start_height)
         end2 = vel_angle_x_intercept(velocity, angle2, acceleration, start_height)
-        end = max(end1, end2)
-        print(end1, end2, end)
-        # create set of x values from 0 to the end value
-        x_coords = np.arange(0, end, 0.01)
-        # find the y values respective to x values
-        y_coords1 = vel_angle_eqn(x_coords, velocity, angle1, acceleration, start_height)
-        y_coords2 = vel_angle_eqn(x_coords, velocity, angle2, acceleration, start_height)
+        # create set of x values from 0 to the max end value
+        x_coords1 = np.arange(0, end1, 0.01)
+        x_coords2 = np.arange(0, end2, 0.01)
+        # find the y values respective to x values for each angle
+        y_coords1 = vel_angle_eqn(x_coords1, velocity, angle1, acceleration, start_height)
+        y_coords2 = vel_angle_eqn(x_coords2, velocity, angle2, acceleration, start_height)
         # plot the x and y coordinates and show graph
-        plt.plot(x_coords, y_coords1)
-        plt.plot(x_coords, y_coords2)
+        plt.plot(x_coords1, y_coords1)
+        plt.plot(x_coords2, y_coords2)
         plt.show()
 
     else:
@@ -375,5 +374,12 @@ def find_theta(x, y, velocity, acceleration, start_height):
     # return theta possibilities
     return theta
 
+
+# makes graphs look nice
+def style_graphs():
+    # annotate() -> annotate a point x,y with text
+    # hlines() -> add horizontal lines from xmin to xmax (get a reference of scale)
+    # axis() -> set to on to add x and y axis
+    pass
 
 
