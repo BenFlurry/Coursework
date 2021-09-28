@@ -329,7 +329,10 @@ def graph_main_velangle(velocity, angle, acceleration, start_height, x, y):
         angle1 = angle[0] * np.pi / 180
         angle2 = angle[1] * np.pi / 180
         # find where the projectile hits the ground to find end point of projectile curve
-        end = vel_angle_x_intercept(velocity, angle1, acceleration, start_height)
+        end1 = vel_angle_x_intercept(velocity, angle1, acceleration, start_height)
+        end2 = vel_angle_x_intercept(velocity, angle2, acceleration, start_height)
+        end = max(end1, end2)
+        print(end1, end2, end)
         # create set of x values from 0 to the end value
         x_coords = np.arange(0, end, 0.01)
         # find the y values respective to x values

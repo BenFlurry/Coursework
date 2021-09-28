@@ -20,7 +20,7 @@ class CalculateVelAngleWindow(QMainWindow, ui):
                        self.acceleration.text(),
                        self.start_height.text(),
                        self.x_coord.text(),
-                       self.x_coord.text()]
+                       self.y_coord.text()]
 
     def calculate_values(self):
         # take pulled values
@@ -38,10 +38,11 @@ class CalculateVelAngleWindow(QMainWindow, ui):
         # unpack the list
         vel, ang, acc, sh, x, y = self.values
 
-        # if there are the correct permuations of values, run the main velangle function
+        # if there are the correct permutations of values, run the main velangle function
         if value_exists == [1, 0, 1, 1, 1, 1] or value_exists == [1, 1, 1, 1, 0, 0]:
             graph_main_velangle(vel, ang, acc, sh, x, y)
 
+
 '''
-have it so values are int unless '' before entering into the library
+need to change the style of matplotlib graph
 '''
