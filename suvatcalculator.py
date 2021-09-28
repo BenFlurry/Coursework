@@ -22,9 +22,16 @@ class CalculateSuvatWindow(QMainWindow, ui):
     def calculate_values(self):
         # take pulled values
         self.pull_values()
+        # iterate through values, if '', leave else change to integer
+        for i in range(len(self.values_suvat)):
+            if not self.values_suvat[i] == '':
+                self.value_suvat[i] = int(self.values_suvat[i])
+
+        for i in range(len(self.values_suvat)):
+            if not self.values_svt[i] == '':
+                self.values_svt[i] = int(self.values_svt[i])
+
+        self.start_height = int(self.start_height)
         # run the main function from suvat library
         graph_main_suvat(self.values_suvat, self.values_svt, self.start_height)
 
-'''
-have it so values are int unless '' before entering into the library
-'''

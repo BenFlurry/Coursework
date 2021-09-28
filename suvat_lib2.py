@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import string
 
 
 # VERTICAL COMPONENT
@@ -205,12 +204,6 @@ def para_vel_angle_arr(velocity, angle, acceleration):
     return para_create_coords_lists(uy, ay, vx)
 
 
-# uses matplotlib.pyplot as plt to plot the graph with given coords
-def plot_graph(x_coords, y_coords):
-    plt.plot(x_coords, y_coords)
-    plt.show()
-
-
 # find u, a variables from suvat
 def find_sua(values):
     # set empty variables to none, so they can be integers
@@ -297,7 +290,7 @@ def graph_main_suvat(values_suvat, values_svt, start_height):
         values_svt = find_v(values_svt)
     # create list of coords
     coords = para_hor_ver_arr(values_suvat, values_svt, start_height)
-    plot_graph(coords[0], coords[1])
+    plt.plot(coords[0], coords[1])
     return coords
 
 
