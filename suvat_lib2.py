@@ -317,7 +317,6 @@ def vel_angle_x_intercept(velocity, angle, acceleration, start_height):
 def graph_main_velangle(velocity, angle, acceleration, start_height, x, y):
     if angle == '':
         angle = find_theta(x, y, velocity, acceleration, start_height)
-        print(angle[0], angle[1])
         # convert angle from degrees to radians
         angle1 = angle[0] * np.pi / 180
         angle2 = angle[1] * np.pi / 180
@@ -351,15 +350,12 @@ def graph_main_velangle(velocity, angle, acceleration, start_height, x, y):
 
 # finds theta given x,y,u,a,start height
 def find_theta(x, y, velocity, acceleration, start_height):
-    print(x, y, velocity, acceleration, start_height)
     # make graph start at (0,0)
     y = y - start_height
     # find abc coefficients of atheta^2 + btheta + c = 0
     a = ((-acceleration) * (x**2)) / (2 * (velocity**2))
     b = -x
     c = ((-acceleration) * (x**2)) / (2 * (velocity**2)) + y
-
-    print(b**2 - (4*a*c))
     # find tan theta roots
     tan_theta = np.array(np.roots([a, b, c]))
     # convert to degrees from radians and wrap as tuple

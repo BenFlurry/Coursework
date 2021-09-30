@@ -11,8 +11,8 @@ class App(QMainWindow):
         # run the initialisation of the QMainWindow
         super().__init__()
         # create and load the suvat entry window and show it
-        self.setup_suvat_svt_entry()
-        # self.setup_vel_angle_entry()
+        # self.setup_suvat_svt_entry()
+        self.setup_vel_angle_entry()
         self.show()
 
         # set up event handlers
