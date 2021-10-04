@@ -366,7 +366,7 @@ def find_theta(x, y, velocity, acceleration, start_height):
 
 # makes graphs look nice
 def style_graphs():
-    # annotate() -> annotate a point x,y with text
+    # annotate() -> annotate a point x,y with text. might have to convert to numpy array to then find max etc.
     # hlines() -> add horizontal lines from xmin to xmax (get a reference of scale)
     # axis() -> set to on to add x and y axis
     pass
