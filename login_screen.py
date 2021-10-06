@@ -5,11 +5,9 @@ from signin_screen import SigninScreen
 from create_account_screen import CreateAccountScreen
 ui = uic.loadUiType('login_screen.ui')[0]
 
-
 '''
-push button -> sign in
+push button -> signin
 push button -> create_account
-push button -> guest
 '''
 
 
