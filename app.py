@@ -22,6 +22,7 @@ class App(QMainWindow):
 
         # set up event handlers
 
+
     def setup_vel_angle_entry(self):
         self.calculate_velangle_window = CalculateVelAngleWindow(self)
 
