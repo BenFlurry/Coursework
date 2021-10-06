@@ -18,6 +18,7 @@ class LoginScreen(QMainWindow, ui):
 
         self.signin.clicked.connect(self.load_signin)
         self.create_account.clicked.connect(self.load_create_account)
+        self.show()
 
     def load_signin(self):
         self.signin_window = SigninScreen(self)
