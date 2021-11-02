@@ -1,3 +1,2 @@
-end1 = 1
-end2 = 2
-print(max(end1,end2))
+f = True
+print(1-f)

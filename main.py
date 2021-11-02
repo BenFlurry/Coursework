@@ -18,7 +18,7 @@ sys.excepthook = my_exception_hook
 
 def main():
     app = QApplication(sys.argv)
-    app_window = App()
+    window = App()
     sys.exit(app.exec_())
 
 

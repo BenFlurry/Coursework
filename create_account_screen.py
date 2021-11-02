@@ -4,6 +4,7 @@ from suvat_lib2 import *
 from email_validator import validate_email, EmailNotValidError
 from signin_screen import SigninScreen
 import string
+from error_popup import ErrorPopup
 
 ui = uic.loadUiType('create_account_screen.ui')[0]
 
@@ -27,25 +28,26 @@ class CreateAccountScreen(QMainWindow, ui):
 
         self.create_account.clicked.connect(self.validate_account)
         self.back.clicked.connect(self.load_signin)
-        self.account_type = 'teacher'
-        self.student = False
-        self.teacher = False
-        self.email = ''
-        self.username = ''
-        self.password1 = ''
-        self.password2 = ''
-        self.valid_email = False
-        self.valid_password = False
+        self.show_password.clicked.connect(self.toggle_password)
+
+        # self.account_type = 'teacher'
+        # self.student = False
+        # self.teacher = False
+        # self.email = ''
+        # self.username = ''
+        # self.password1 = ''
+        # self.password2 = ''
+        # self.valid_email = False
+        # self.valid_password = False
 
     def validate_account(self):
         # pull values from PyQt5
-        self.student = self.inp_student.isChecked()
-        self.teacher = self.inp_teacher.isChecked()
-        self.email = self.inp_email.text()
-        print('here')
-        self.username = self.inp_username.text()
-        self.password1 = self.inp_password1.text()
-        self.password2 = self.inp_password2.text()
+        self.student = self.student.isChecked()
+        self.teacher = self.teacher.isChecked()
+        self.email = self.email.text()
+        self.username = self.username.text()
+        self.password1 = self.password1.text()
+        self.password2 = self.password2.text()
 
         print(f'student: {self.student}\n'
               f'teacher: {self.teacher}\n'
@@ -59,6 +61,10 @@ class CreateAccountScreen(QMainWindow, ui):
         self.check_email()
         self.check_password()
         # check what account type it is
+
+    def output_error(self, error_message):
+        error_popup = ErrorPopup(self)
+        error_popup.set_error_message(error_message)
 
     def check_account_type(self):
         if self.student:
@@ -93,15 +99,28 @@ class CreateAccountScreen(QMainWindow, ui):
                     # check it has at least a number
                     if any(letter.isdigit() for letter in password):
                         self.valid_password = True
-                        print('valid password')
+                        error_message = 'valid password'
                     else:
-                        print('password needs to have a number')
+                        error_message = 'password needs to have a number'
                 else:
-                    print('password needs to have a special symbol')
+                    error_message = 'password needs to have a special symbol'
             else:
-                print('password has to be 8 or more characters')
+                error_message = 'password has to be 8 or more characters'
         else:
-            print('enter matching passwords')
+            error_message = 'enter matching passwords'
+        self.output_error(error_message)
 
     def load_signin(self):
         self.signin_window = SigninScreen(self)
+
+    # when show_password button is pressed, run the function to change the password echo
+    def toggle_password(self):
+        if self.show_password.isChecked():
+            self.password1.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.password2.setEchoMode(QLineEdit.EchoMode.Normal)
+
+        else:
+            self.password1.setEchoMode(QLineEdit.EchoMode.Password)
+            self.password2.setEchoMode(QLineEdit.EchoMode.Password)
+
+

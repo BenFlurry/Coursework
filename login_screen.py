@@ -10,7 +10,6 @@ push button -> signin
 push button -> create_account
 '''
 
-
 class LoginScreen(QMainWindow, ui):
     def __init__(self, app_window):
         super().__init__()
@@ -22,6 +21,8 @@ class LoginScreen(QMainWindow, ui):
 
     def load_signin(self):
         self.signin_window = SigninScreen(self)
+        # self.show()
 
     def load_create_account(self):
         self.create_account_window = CreateAccountScreen(self)
+        # self.show()
