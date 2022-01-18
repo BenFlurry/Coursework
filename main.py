@@ -9,7 +9,7 @@ import traceback
 # print errors into command line
 def my_exception_hook(exctype, value, traceback):
     print(exctype, value, traceback)
-    sys._excepthook(exctype, value, traceback)
+    sys.excepthook(exctype, value, traceback)
     # sys.exit(1)
 
 

@@ -5,6 +5,8 @@ from email_validator import validate_email, EmailNotValidError
 from signin_screen import SigninScreen
 import string
 from error_popup import ErrorPopup
+import sqlite3
+import hashlib
 
 ui = uic.loadUiType('create_account_screen.ui')[0]
 
@@ -29,7 +31,7 @@ class CreateAccountScreen(QMainWindow, ui):
         self.create_account.clicked.connect(self.validate_account)
         self.back.clicked.connect(self.load_signin)
         self.show_password.clicked.connect(self.toggle_password)
-
+        self.details ={}
         # self.account_type = 'teacher'
         # self.student = False
         # self.teacher = False
@@ -39,6 +41,9 @@ class CreateAccountScreen(QMainWindow, ui):
         # self.password2 = ''
         # self.valid_email = False
         # self.valid_password = False
+
+    def load_signin(self):
+        pass
 
     def validate_account(self):
         # pull values from PyQt5
@@ -56,10 +61,12 @@ class CreateAccountScreen(QMainWindow, ui):
               f'password1: {self.password1}\n'
               f'password2: {self.password2}\n')
 
+        self.account_type = ''
         self.check_account_type()
         self.check_username()
         self.check_email()
         self.check_password()
+        self.add_user()
         # check what account type it is
 
     def output_error(self, error_message):
@@ -68,25 +75,32 @@ class CreateAccountScreen(QMainWindow, ui):
 
     def check_account_type(self):
         if self.student:
-            self.account_type == 'student'
+            self.account_type = 'student'
         elif self.teacher:
-            self.account_type == 'teacher'
+            self.account_type = 'teacher'
         else:
             # create dialogue screen saying to select account
             pass
+        self.details['account_type'] = self.account_type
 
-    def check_username(self):
-        # query database and check username not taken
-        pass
 
     def check_email(self):
         try:
             valid = validate_email(self.email)
             # update with the normalized form
             self.email = valid.email
+            print('valid email')
+            self.details['email'] = self.email
         except EmailNotValidError as e:
             # need to create dialogue screen saying invalid email
             print(str(e))
+
+    def check_username(self):
+        self.details['username'] = self.username
+
+    def hash_password(self):
+        self.password = hashlib.sha256(self.password1.encode()).hexdigest()
+        print(self.password)
 
     def check_password(self):
         # check the 2 entered passwords are the same
@@ -100,6 +114,9 @@ class CreateAccountScreen(QMainWindow, ui):
                     if any(letter.isdigit() for letter in password):
                         self.valid_password = True
                         error_message = 'valid password'
+                        # hash the password using SHA hash
+                        self.hash_password()
+                        self.details['password'] = self.password
                     else:
                         error_message = 'password needs to have a number'
                 else:
@@ -108,10 +125,8 @@ class CreateAccountScreen(QMainWindow, ui):
                 error_message = 'password has to be 8 or more characters'
         else:
             error_message = 'enter matching passwords'
-        self.output_error(error_message)
+        # self.output_error(error_message)
 
-    def load_signin(self):
-        self.signin_window = SigninScreen(self)
 
     # when show_password button is pressed, run the function to change the password echo
     def toggle_password(self):
@@ -124,3 +139,10 @@ class CreateAccountScreen(QMainWindow, ui):
             self.password2.setEchoMode(QLineEdit.EchoMode.Password)
 
 
+    def add_user(self):
+        self.conn = sqlite3.connect('database.db', isolation_level=None)
+        self.c = self.conn.cursor()
+        query = 'INSERT INTO users(userid, username, email, password, account_type) VALUES(null, :username, :email, ' \
+                ':password, :account_type)'
+        print(self.details)
+        self.c.execute(query, self.details)

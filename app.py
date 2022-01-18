@@ -5,6 +5,8 @@ from PyQt5 import uic
 from suvatcalculator import CalculateSuvatWindow
 from velanglecalculator import CalculateVelAngleWindow
 from login_screen import LoginScreen
+from error_popup import ErrorPopup
+from create_account_screen import CreateAccountScreen
 
 
 class App(QMainWindow):
@@ -14,7 +16,9 @@ class App(QMainWindow):
         # create and load the suvat entry window and show it
         # self.setup_suvat_svt_entry()
         # self.setup_vel_angle_entry()
-        self.setup_login_screen()
+        # self.setup_login_screen()
+        # self.setup_error_message()
+        self.setup_create_account_screen()
         self.show()
 
         # set up event handlers
@@ -28,4 +32,8 @@ class App(QMainWindow):
     def setup_login_screen(self):
         self.login_screen = LoginScreen(self)
 
+    def setup_error_message(self):
+        self.error_popup = ErrorPopup(self)
 
+    def setup_create_account_screen(self):
+        self.create_account = CreateAccountScreen(self)

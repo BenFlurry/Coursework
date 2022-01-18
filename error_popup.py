@@ -10,6 +10,7 @@ class ErrorPopup(QMainWindow, ui):
     def __init__(self, app_window):
         super().__init__()
         self.setupUi(app_window)
+        self.error_message.setPlainText('')
 
 
     def set_error_message(self, error_message):
