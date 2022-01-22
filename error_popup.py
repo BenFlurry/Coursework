@@ -15,3 +15,12 @@ class ErrorPopup(QMainWindow, ui):
 
     def set_error_message(self, error_message):
         self.error_message.setPlainText(error_message)
+
+'''
+.setText
+.setInformativeText
+.setIcon(QMessageBox.Information)
+.setStandardButtons(QMessageBox.Ok)
+.setDefaultButton(QMessageBox.Ok)
+.exec()
+'''
