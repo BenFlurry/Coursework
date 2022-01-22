@@ -7,7 +7,7 @@ from velanglecalculator import CalculateVelAngleWindow
 from login_screen import LoginScreen
 from error_popup import ErrorPopup
 from create_account_screen import CreateAccountScreen
-
+from signin_screen import SigninScreen
 
 class App(QMainWindow):
     def __init__(self):
@@ -18,7 +18,8 @@ class App(QMainWindow):
         # self.setup_vel_angle_entry()
         # self.setup_login_screen()
         # self.setup_error_message()
-        self.setup_create_account_screen()
+        # self.setup_create_account_screen()
+        self. setup_signin_window()
         self.show()
 
         # set up event handlers
@@ -37,3 +38,6 @@ class App(QMainWindow):
 
     def setup_create_account_screen(self):
         self.create_account = CreateAccountScreen(self)
+
+    def setup_signin_window(self):
+        self.signin_window = SigninScreen(self)

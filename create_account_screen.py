@@ -31,7 +31,7 @@ class CreateAccountScreen(QMainWindow, ui):
         self.create_account.clicked.connect(self.validate_account)
         self.back.clicked.connect(self.load_signin)
         self.show_password.clicked.connect(self.toggle_password)
-        self.details ={}
+        self.details = {}
         # self.account_type = 'teacher'
         # self.student = False
         # self.teacher = False
@@ -146,3 +146,7 @@ class CreateAccountScreen(QMainWindow, ui):
                 ':password, :account_type)'
         print(self.details)
         self.c.execute(query, self.details)
+
+
+## create the stacked widget instance
+## stackwidget.addWidget(windowname)
