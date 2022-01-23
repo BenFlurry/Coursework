@@ -1,10 +1,10 @@
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit, QMessageBox
 from PyQt5 import uic
 from suvat_lib2 import *
 from email_validator import validate_email, EmailNotValidError
 from signin_screen import SigninScreen
 import string
-from error_popup import ErrorPopup
+# from error_popup import ErrorPopup
 import sqlite3
 import hashlib
 
@@ -28,10 +28,11 @@ class CreateAccountScreen(QMainWindow, ui):
         super().__init__()
         self.setupUi(app_window)
 
+        # hook up the buttons
         self.create_account.clicked.connect(self.validate_account)
         self.back.clicked.connect(self.load_signin)
         self.show_password.clicked.connect(self.toggle_password)
-        self.details ={}
+        self.details = {}
         # self.account_type = 'teacher'
         # self.student = False
         # self.teacher = False
@@ -45,6 +46,7 @@ class CreateAccountScreen(QMainWindow, ui):
     def load_signin(self):
         pass
 
+    # make sure that the account is valid
     def validate_account(self):
         # pull values from PyQt5
         self.student = self.student.isChecked()
@@ -67,11 +69,6 @@ class CreateAccountScreen(QMainWindow, ui):
         self.check_email()
         self.check_password()
         self.add_user()
-        # check what account type it is
-
-    def output_error(self, error_message):
-        error_popup = ErrorPopup(self)
-        error_popup.set_error_message(error_message)
 
     def check_account_type(self):
         if self.student:
@@ -79,10 +76,13 @@ class CreateAccountScreen(QMainWindow, ui):
         elif self.teacher:
             self.account_type = 'teacher'
         else:
-            # create dialogue screen saying to select account
-            pass
+            self.box.setWindowTitle('Error')
+            self.box.setText('Select an account type')
+            self.box.setIcon(QMessageBox.Critical)
+            self.box.setStandardButtons(QMessageBox.Ok)
+            self.box.setDefaultButton(QMessageBox.Ok)
+            self.box.exec()
         self.details['account_type'] = self.account_type
-
 
     def check_email(self):
         try:
@@ -92,8 +92,13 @@ class CreateAccountScreen(QMainWindow, ui):
             print('valid email')
             self.details['email'] = self.email
         except EmailNotValidError as e:
-            # need to create dialogue screen saying invalid email
-            print(str(e))
+            self.box.setWindowTitle('Error')
+            self.box.setText('Invalid email')
+            self.box.setInformativeText(e)
+            self.box.setIcon(QMessageBox.Critical)
+            self.box.setStandardButtons(QMessageBox.Ok)
+            self.box.setDefaultButton(QMessageBox.Ok)
+            self.box.exec()
 
     def check_username(self):
         self.details['username'] = self.username
@@ -112,11 +117,14 @@ class CreateAccountScreen(QMainWindow, ui):
                 if any(not letter.isalnum() and not letter.isspace() for letter in password):
                     # check it has at least a number
                     if any(letter.isdigit() for letter in password):
-                        self.valid_password = True
-                        error_message = 'valid password'
-                        # hash the password using SHA hash
-                        self.hash_password()
-                        self.details['password'] = self.password
+                        if any(letter.isupper() for letter in password):
+                            self.valid_password = True
+                            error_message = 'valid password'
+                            # hash the password using SHA hash
+                            self.hash_password()
+                            self.details['password'] = self.password
+                        else:
+                            error_message = 'password needs to have a capital letter'
                     else:
                         error_message = 'password needs to have a number'
                 else:
@@ -125,8 +133,13 @@ class CreateAccountScreen(QMainWindow, ui):
                 error_message = 'password has to be 8 or more characters'
         else:
             error_message = 'enter matching passwords'
-        # self.output_error(error_message)
-
+        self.box.setWindowTitle('Error')
+        self.box.setText('Password error:')
+        self.box.setInformativeText(error_message)
+        self.box.setIcon(QMessageBox.Critical)
+        self.box.setStandardButtons(QMessageBox.Ok)
+        self.box.setDefaultButton(QMessageBox.Ok)
+        self.box.exec()
 
     # when show_password button is pressed, run the function to change the password echo
     def toggle_password(self):
@@ -138,11 +151,20 @@ class CreateAccountScreen(QMainWindow, ui):
             self.password1.setEchoMode(QLineEdit.EchoMode.Password)
             self.password2.setEchoMode(QLineEdit.EchoMode.Password)
 
-
     def add_user(self):
-        self.conn = sqlite3.connect('database.db', isolation_level=None)
-        self.c = self.conn.cursor()
-        query = 'INSERT INTO users(userid, username, email, password, account_type) VALUES(null, :username, :email, ' \
-                ':password, :account_type)'
-        print(self.details)
-        self.c.execute(query, self.details)
+        try:
+            self.conn = sqlite3.connect('database.db', isolation_level=None)
+            self.c = self.conn.cursor()
+            query = 'INSERT INTO users(userid, username, email, password, account_type) VALUES(null, :username, :email, ' \
+                    ':password, :account_type)'
+            print(self.details)
+            self.c.execute(query, self.details)
+            print('new account created')
+        except sqlite3.IntegrityError as e:
+            self.box.setWindowTitle('Error')
+            self.box.setText('Your username or email already exists')
+            self.box.setInformativeText(e)
+            self.box.setIcon(QMessageBox.Critical)
+            self.box.setStandardButtons(QMessageBox.Ok)
+            self.box.setDefaultButton(QMessageBox.Ok)
+            self.box.exec()

@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit
 from PyQt5 import uic
 from suvat_lib2 import *
 from signin_screen import SigninScreen
-from create_account_screen import CreateAccountScreen
+# from create_account_screen import CreateAccountScreen
 ui = uic.loadUiType('login_screen.ui')[0]
 
 '''
