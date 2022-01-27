@@ -25,7 +25,7 @@ class SigninScreen(QMainWindow, ui):
 
         self.sign_in.clicked.connect(self.signin)
         self.show_password.clicked.connect(self.toggle_password)
-        self.conn = sqlite3.connect('database.db', isolation_level=None)
+        self.conn = sqlite3.connect('database2.db', isolation_level=None)
         self.c = self.conn.cursor()
         self.valid = False
 
@@ -60,13 +60,16 @@ class SigninScreen(QMainWindow, ui):
         print(user)
         self.box.setIcon(QMessageBox.Critical)
         # if the email doesnt exist, then the account username and email is incorrect
+
         if len(user) != 0:
             user = user[0]
             # to check the password, we need to first hash it
             self.pw = hashlib.sha256(self.pw.encode()).hexdigest()
             # check if the password is correct
+
             if self.pw == user[3]:
                 # check if the user is of the correct account type
+
                 if self.account_type == 'teacher':
                     self.c.execute('SELECT teacherid FROM teachers WHERE userid = ?', (user[0],))
                     teachers = self.c.fetchall()
@@ -77,9 +80,12 @@ class SigninScreen(QMainWindow, ui):
                     else:
                         msg = 'A teacher does not exist with these credentials'
                     # update the data class with the user id
+
                 elif self.account_type == 'student':
+                    print(user[0])
                     self.c.execute('SELECT studentid FROM students WHERE userid = ?', (user[0],))
                     students = self.c.fetchall()
+                    print(f'{students = }')
                     if len(students) == 1:
                         msg = 'Valid account, welcome to the program'
                         self.box.setIcon(QMessageBox.Information)
@@ -96,7 +102,6 @@ class SigninScreen(QMainWindow, ui):
         print(msg)
         self.box.setWindowTitle('Error')
         self.box.setText(msg)
-        self.box.setIcon(QMessageBox.Critical)
         self.box.setStandardButtons(QMessageBox.Ok)
         self.box.setDefaultButton(QMessageBox.Ok)
         self.box.exec()
