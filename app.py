@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QLineEdit
 import sys
 from PyQt5 import uic
-
+from teacher_landing import TeacherLanding
 from suvatcalculator import CalculateSuvatWindow
 from velanglecalculator import CalculateVelAngleWindow
 from login_screen import LoginScreen
@@ -21,9 +21,13 @@ class App(QMainWindow):
         # self.setup_error_message()
         # self.setup_create_account_screen()
         self.setup_signin_screen()
+        # self.setup_teacher_landing()
         self.show()
 
         # set up event handlers
+
+    def setup_teacher_landing(self):
+        self.teacher_landing = TeacherLanding(self)
 
     def setup_vel_angle_entry(self):
         self.calculate_velangle_window = CalculateVelAngleWindow(self)
@@ -34,8 +38,8 @@ class App(QMainWindow):
     def setup_login_screen(self):
         self.login_screen = LoginScreen(self)
 
-    def setup_error_message(self):
-        self.error_popup = ErrorPopup(self)
+    # def setup_error_message(self):
+    #     self.error_popup = ErrorPopup(self)
 
     def setup_create_account_screen(self):
         self.create_account = CreateAccountScreen(self)

@@ -42,6 +42,8 @@ class CreateAccountScreen(QMainWindow, ui):
         # self.password2 = ''
         # self.valid_email = False
         # self.valid_password = False
+        self.box = QMessageBox()
+        self.box.Icon(QMessageBox.Critical)
 
     def load_signin(self):
         pass
@@ -49,19 +51,13 @@ class CreateAccountScreen(QMainWindow, ui):
     # make sure that the account is valid
     def validate_account(self):
         # pull values from PyQt5
-        self.student = self.student.isChecked()
-        self.teacher = self.teacher.isChecked()
-        self.email = self.email.text()
-        self.username = self.username.text()
-        self.password1 = self.password1.text()
-        self.password2 = self.password2.text()
-
-        print(f'student: {self.student}\n'
-              f'teacher: {self.teacher}\n'
-              f'email: {self.email}\n'
-              f'username: {self.username}\n'
-              f'password1: {self.password1}\n'
-              f'password2: {self.password2}\n')
+        self.student = self.qstudent.isChecked()
+        self.teacher = self.qteacher.isChecked()
+        self.email = self.qemail.text()
+        self.username = self.qusername.text()
+        self.password1 = self.qpassword1.text()
+        self.password2 = self.qpassword2.text()
+        self.name = self.qname.text()
 
         self.account_type = ''
         self.check_account_type()
@@ -78,7 +74,6 @@ class CreateAccountScreen(QMainWindow, ui):
         else:
             self.box.setWindowTitle('Error')
             self.box.setText('Select an account type')
-            self.box.setIcon(QMessageBox.Critical)
             self.box.setStandardButtons(QMessageBox.Ok)
             self.box.setDefaultButton(QMessageBox.Ok)
             self.box.exec()
@@ -95,13 +90,13 @@ class CreateAccountScreen(QMainWindow, ui):
             self.box.setWindowTitle('Error')
             self.box.setText('Invalid email')
             self.box.setInformativeText(e)
-            self.box.setIcon(QMessageBox.Critical)
             self.box.setStandardButtons(QMessageBox.Ok)
             self.box.setDefaultButton(QMessageBox.Ok)
             self.box.exec()
 
     def check_username(self):
         self.details['username'] = self.username
+        self.details['name'] = self.name
 
     def hash_password(self):
         self.password = hashlib.sha256(self.password1.encode()).hexdigest()
@@ -120,6 +115,7 @@ class CreateAccountScreen(QMainWindow, ui):
                         if any(letter.isupper() for letter in password):
                             self.valid_password = True
                             error_message = 'valid password'
+                            self.box.setIcon(QMessageBox.Information)
                             # hash the password using SHA hash
                             self.hash_password()
                             self.details['password'] = self.password
@@ -136,7 +132,6 @@ class CreateAccountScreen(QMainWindow, ui):
         self.box.setWindowTitle('Error')
         self.box.setText('Password error:')
         self.box.setInformativeText(error_message)
-        self.box.setIcon(QMessageBox.Critical)
         self.box.setStandardButtons(QMessageBox.Ok)
         self.box.setDefaultButton(QMessageBox.Ok)
         self.box.exec()
@@ -153,13 +148,24 @@ class CreateAccountScreen(QMainWindow, ui):
 
     def add_user(self):
         try:
-            self.conn = sqlite3.connect('database.db', isolation_level=None)
+            self.conn = sqlite3.connect('database2.db', isolation_level=None)
             self.c = self.conn.cursor()
-            query = 'INSERT INTO users(userid, username, email, password, account_type) VALUES(null, :username, :email, ' \
-                    ':password, :account_type)'
+            query = 'INSERT INTO users(userid, username, email, password, name) VALUES(null, :username, :email, ' \
+                    ':password, :name)'
             print(self.details)
             self.c.execute(query, self.details)
-            print('new account created')
+            print('new user account created')
+
+            # fetch the userid from the created account
+            self.c.execute('SELECT userid FROM users WHERE username = ?', (self.details['username'],))
+            userid = self.c.fetchall()
+            if self.account_type == 'teacher':
+                # and add to teachers table if a teacher
+                self.c.execute('INSERT INTO teachers VALUES(null, ?)', (userid,))
+            elif self.account_type == 'student':
+                # and add to students table if a student
+                self.c.execute('INSERT INTO teachers VALUES(null, ?, null)', (userid,))
+
         except sqlite3.IntegrityError as e:
             self.box.setWindowTitle('Error')
             self.box.setText('Your username or email already exists')
