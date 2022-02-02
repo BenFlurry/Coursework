@@ -41,6 +41,8 @@ class TeacherLanding(QMainWindow, ui):
         self.state = ''
         self.show()
 
+        self.classname = ''
+
         self.creating_class = False
         self.editing_class = False
 
@@ -48,6 +50,8 @@ class TeacherLanding(QMainWindow, ui):
         self.conn.row_factory = dict_factory
         self.c = self.conn.cursor()
         self.load_table()
+
+        self.data = Data()
 
     def create_new_class(self):
         self.creating_class = True
@@ -87,39 +91,57 @@ class TeacherLanding(QMainWindow, ui):
                 qtwi = QTableWidgetItem(str(value))
                 self.table.setItem(rownum, colnum, qtwi)
 
+    def class_creation(self):
+        try:
+            teacherid = self.data.get_teacherid()
+            # take the classname from pyqt
+            # take a selection of the class which is highlighted on the table widget
+            self.classname = self.input1.text()
+            # insert the class name with the teacher id into the classes table
+            self.c.execute('INSERT INTO classes(classid, teacherid, classname) VALUES(null, ?, ?)',
+                           (teacherid, self.classname))
+            print('executed')
+            # hide the widgets which are no longer needed
+            self.label1.setHidden(True)
+            self.input1.setHidden(True)
+            self.edit_class()
+        except Exception as e:
+            print(e)
+
+    def class_editing(self):
+        try:
+            # take the inputted names
+            names = self.input2.toPlainText()
+            # create a list splitting the string of names at the new line char, then remove start and end whitespace
+            names = [word.lstrip().rstrip() for word in names.split('\n')]
+            self.c.execute('SELECT classid FROM classes WHERE classname = ?', (self.classname,))
+            classid = self.c.fetchall()
+
+            # rows = sorted(set(index.row() for index in self.table.selectedIndexes()))
+            rows = [index.row() for index in self.table.selectedIndexes()]
+            print(rows)
+            print('here')
+            classid = int(self.table.item(int(rows[0]), 0).text())
+            print(f'{classid = }, {type(classid)}')
+
+
+            for name in names:
+                self.c.execute('SELECT userid FROM users WHERE name = ?', (name,))
+                uid = self.c.fetchall()[0]
+                userid = uid['userid']
+                print(f'{userid = }, {type(userid)}')
+                # need to add class id to the details dictionary
+                self.c.execute('INSERT INTO students VALUES(null, null, ?) WHERE userid = ?', (classid, userid))
+
+        except Exception as e:
+            print(e)
 
     def save(self):
         if self.creating_class:
-            try:
-                teacherid = 1
-                # take the classname from pyqt
-                self.classname = self.input1.text()
-                # insert the class name with the teacher id into the classes table
-                self.c.execute('INSERT INTO classes(classid, teacherid, classname) VALUES(null, ?, ?)', (teacherid, classname))
-                print('executed')
-                # hide the widgets which are no longer needed
-                self.label1.setHidden(True)
-                self.input1.setHidden(True)
-                self.edit_class()
-            except sqlite3.IntegrityError as e:
-                print(e)
+            self.class_creation()
 
         if self.editing_class:
-            try:
-                # take the inputted names
-                details = {}
-                names = self.input2.toPlainText()
-                # create a list splitting the string of names at the new line char, then remove start and end whitespace
-                names = [word.lstrip().rstrip() for word in names.split('\n')]
-                self.c.execute('SELECT classid FROM classes WHERE classname = ?', (self.classname,))
-                classid = self.c.fetchall()
-                for name in names:
-                    self.c.execute('SELECT userid FROM users WHERE name = ?', (name,))
-                    userid = self.c.fetchall()
-                    print(details)
-                    # need to add class id to the details dictionary
+            self.class_editing()
 
-                    self.c.execute('INSERT INTO students VALUES(null, :userid, :classid)', (userid, classid))
-            except Exception as e:
-                print(e)
+
 

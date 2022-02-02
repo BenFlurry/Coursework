@@ -20,8 +20,8 @@ class App(QMainWindow):
         # self.setup_login_screen()
         # self.setup_error_message()
         # self.setup_create_account_screen()
-        self.setup_signin_screen()
-        # self.setup_teacher_landing()
+        # self.setup_signin_screen()
+        self.setup_teacher_landing()
         self.show()
 
         # set up event handlers
