@@ -16,6 +16,8 @@ push button -> new_class
 push button -> to_simulator
 push button -> logout
 push button -> save_changes
+push button -> delete_class
+push button -> view_class
 table -> table
 line edit -> input1
 plain text edit -> input2
@@ -33,11 +35,14 @@ class TeacherLanding(QMainWindow, ui):
         # self.to_simulator.clicked.connect()
         # self.logout.clicked.connect()
         self.save_changes.clicked.connect(self.save)
+        self.view_class.clicked.connect(self.show_class)
 
         self.label1.setHidden(True)
         self.input1.setHidden(True)
         self.input2.setHidden(True)
         self.save_changes.setHidden(True)
+        self.view_class.setHidden(True)
+        self.delete_class.setHidden(True)
         self.state = ''
         self.show()
 
@@ -68,6 +73,8 @@ class TeacherLanding(QMainWindow, ui):
         self.input2.setHidden(False)
         self.save_changes.setHidden(False)
         self.save_changes.setText('Add students to class')
+        self.view_class.setHidden(False)
+        self.delete_class.setHidden(False)
 
     def load_table(self):
         # selects everything in the database
@@ -76,6 +83,31 @@ class TeacherLanding(QMainWindow, ui):
         rows = self.c.fetchall()
         # add the headings
         headings = ["classid", "teacherid", "classname"]
+        # clear the pyqt table
+        self.table.clear()
+        # find the dimensions of the table
+        self.table.setColumnCount(len(headings))
+        self.table.setRowCount(len(rows))
+        # set up the headings of the table
+        self.table.setHorizontalHeaderLabels(headings)
+
+        # iterating through the python table rows
+        for rownum, row in enumerate(rows):
+            # need to convert row from tuple to dictionary to work
+            for colnum, (col, value) in enumerate(row.items()):
+                qtwi = QTableWidgetItem(str(value))
+                self.table.setItem(rownum, colnum, qtwi)
+
+    def show_class(self):
+        rows = [index.row() for index in self.table.selectedIndexes()]
+        # take the classid value in the table from the selected rows
+        classid = int(self.table.item(int(rows[0]), 0).text())
+        print(f'{classid = }')
+        select = 'SELECT name, username, email FROM users INNER JOIN students ON users.userid = students.userid WHERE classid = ?'
+        self.c.execute(select, (classid,))
+        rows = self.c.fetchall()
+        # add the headings
+        headings = ["name", "username", "email"]
         # clear the pyqt table
         self.table.clear()
         # find the dimensions of the table
@@ -114,24 +146,22 @@ class TeacherLanding(QMainWindow, ui):
             names = self.input2.toPlainText()
             # create a list splitting the string of names at the new line char, then remove start and end whitespace
             names = [word.lstrip().rstrip() for word in names.split('\n')]
-            self.c.execute('SELECT classid FROM classes WHERE classname = ?', (self.classname,))
-            classid = self.c.fetchall()
 
-            # rows = sorted(set(index.row() for index in self.table.selectedIndexes()))
+            # pull the indexes of the selected rows in the pyqt table
             rows = [index.row() for index in self.table.selectedIndexes()]
-            print(rows)
-            print('here')
+            # take the classid value in the table from the selected rows
             classid = int(self.table.item(int(rows[0]), 0).text())
-            print(f'{classid = }, {type(classid)}')
 
-
+            # for each name being added to the class
             for name in names:
+                # find their userid from the users table corresponding to their name
                 self.c.execute('SELECT userid FROM users WHERE name = ?', (name,))
                 uid = self.c.fetchall()[0]
+                # take the userid out of the dictionary
                 userid = uid['userid']
                 print(f'{userid = }, {type(userid)}')
-                # need to add class id to the details dictionary
-                self.c.execute('INSERT INTO students VALUES(null, null, ?) WHERE userid = ?', (classid, userid))
+                # update the students table adding their class
+                self.c.execute('UPDATE students SET classid = ? WHERE userid = ?', (classid, userid))
 
         except Exception as e:
             print(e)
