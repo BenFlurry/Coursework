@@ -36,6 +36,7 @@ class TeacherLanding(QMainWindow, ui):
         # self.logout.clicked.connect()
         self.save_changes.clicked.connect(self.save)
         self.view_class.clicked.connect(self.show_class)
+        self.delete_class.clicked.connect(self.remove_student)
 
         self.label1.setHidden(True)
         self.input1.setHidden(True)
@@ -54,7 +55,9 @@ class TeacherLanding(QMainWindow, ui):
         self.conn = sqlite3.connect('database2.db', isolation_level=None)
         self.conn.row_factory = dict_factory
         self.c = self.conn.cursor()
-        self.load_table()
+        select = self.c.execute('SELECT * FROM classes').fetchall()
+        headings = ["classid", "teacherid", "classname"]
+        self.load_table(headings, select)
 
         self.data = Data()
 
@@ -75,14 +78,12 @@ class TeacherLanding(QMainWindow, ui):
         self.save_changes.setText('Add students to class')
         self.view_class.setHidden(False)
         self.delete_class.setHidden(False)
+        self.delete_class.setText('Delete students')
+        # TODO be able to go back to add class or edit class screen
 
-    def load_table(self):
-        # selects everything in the database
-        select = 'SELECT * FROM classes'
-        self.c.execute(select)
-        rows = self.c.fetchall()
-        # add the headings
-        headings = ["classid", "teacherid", "classname"]
+    # TODO make loading all the classes its own function to allow going back to the class view
+
+    def load_table(self, headings, rows):
         # clear the pyqt table
         self.table.clear()
         # find the dimensions of the table
@@ -93,32 +94,7 @@ class TeacherLanding(QMainWindow, ui):
 
         # iterating through the python table rows
         for rownum, row in enumerate(rows):
-            # need to convert row from tuple to dictionary to work
-            for colnum, (col, value) in enumerate(row.items()):
-                qtwi = QTableWidgetItem(str(value))
-                self.table.setItem(rownum, colnum, qtwi)
-
-    def show_class(self):
-        rows = [index.row() for index in self.table.selectedIndexes()]
-        # take the classid value in the table from the selected rows
-        classid = int(self.table.item(int(rows[0]), 0).text())
-        print(f'{classid = }')
-        select = 'SELECT name, username, email FROM users INNER JOIN students ON users.userid = students.userid WHERE classid = ?'
-        self.c.execute(select, (classid,))
-        rows = self.c.fetchall()
-        # add the headings
-        headings = ["name", "username", "email"]
-        # clear the pyqt table
-        self.table.clear()
-        # find the dimensions of the table
-        self.table.setColumnCount(len(headings))
-        self.table.setRowCount(len(rows))
-        # set up the headings of the table
-        self.table.setHorizontalHeaderLabels(headings)
-
-        # iterating through the python table rows
-        for rownum, row in enumerate(rows):
-            # need to convert row from tuple to dictionary to work
+            # and columns, loading the table cell by cell
             for colnum, (col, value) in enumerate(row.items()):
                 qtwi = QTableWidgetItem(str(value))
                 self.table.setItem(rownum, colnum, qtwi)
@@ -162,9 +138,46 @@ class TeacherLanding(QMainWindow, ui):
                 print(f'{userid = }, {type(userid)}')
                 # update the students table adding their class
                 self.c.execute('UPDATE students SET classid = ? WHERE userid = ?', (classid, userid))
+            # TODO call the load classes here
 
         except Exception as e:
             print(e)
+
+    def load_students(self):
+        select = 'SELECT studentid, name, username, email ' \
+                 'FROM users ' \
+                 'INNER JOIN students ON users.userid = students.userid ' \
+                 'WHERE classid = ?'
+        self.c.execute(select, (self.classid,))
+        rows = self.c.fetchall()
+        # add the headings
+        headings = ["student id", "name", "username", "email"]
+        # clear the pyqt table
+        self.load_table(headings, rows)
+
+
+    def show_class(self):
+        rows = [index.row() for index in self.table.selectedIndexes()]
+        # take the classid value in the table from the selected rows
+        self.classid = int(self.table.item(int(rows[0]), 0).text())
+        print(f'{self.classid = }')
+        self.load_students()
+
+    def remove_student(self):
+        # pull indexes of the students
+        rows = [index.row() for index in self.table.selectedIndexes()]
+        # get rid of duplicate row indexes
+        rows = list(dict.fromkeys(rows))
+        print(f'{rows = }')
+        # take the classid value in the table from the selected rows
+        studentids = []
+        # and add them to the list of students to be deleted
+        for i in range(len(rows)):
+            studentid = (int(self.table.item(int(rows[i]), 0).text()))
+            self.c.execute('UPDATE students SET classid = ? WHERE userid = ?', ('', studentid))
+        print(f'{studentids = }')
+        # reload the table
+        self.load_students()
 
     def save(self):
         if self.creating_class:
