@@ -4,6 +4,10 @@ class Data:
         self.userid = -1
         self.studentid = -1
 
+    def test(self):
+        self.userid = 3
+        self.teacherid = 1
+
     def set_userid(self, userid):
         self.userid = userid
 
