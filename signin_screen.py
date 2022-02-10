@@ -51,6 +51,7 @@ class SigninScreen(QMainWindow, ui):
         self.pw = self.password.text()
         self.check_un_pw()
 
+
     def check_un_pw(self):
         # first check if there is a matching email or password in the database
         self.c.execute('SELECT * FROM users WHERE username = ? or email = ?', (self.un, self.un))

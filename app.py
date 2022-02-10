@@ -5,9 +5,8 @@ from teacher_landing import TeacherLanding
 from suvatcalculator import CalculateSuvatWindow
 from velanglecalculator import CalculateVelAngleWindow
 from login_screen import LoginScreen
-# from error_popup import ErrorPopup
-from create_account_screen import CreateAccountScreen
 from signin_screen import SigninScreen
+from create_account_screen import CreateAccountScreen
 
 
 class App(QMainWindow):
@@ -23,6 +22,25 @@ class App(QMainWindow):
 
         # set up event handlers
 
+    # todo get this sorted copying jackson
+    # todo based off of the input window name, add the handlers for that window using if statements
+    def to_next_page(self, window):
+        window.create_account.clicked.connect(self.setup_create_account_screen)
+        window.signin.clicked.connect(self.setup_login_screen)
+
+    def setup_login_screen(self):
+        self.login_screen = LoginScreen(self)
+        self.to_next_page(self.login_screen)
+
+    def setup_create_account_screen(self):
+        self.login_screen.close()
+        self.create_account = CreateAccountScreen(self)
+
+
+    def setup_signin_screen(self):
+        self.login_screen.close()
+        self.signin_screen = SigninScreen(self)
+
     def setup_teacher_landing(self):
         self.teacher_landing = TeacherLanding(self)
 
@@ -31,18 +49,3 @@ class App(QMainWindow):
 
     def setup_suvat_svt_entry(self):
         self.calculate_suvat_window = CalculateSuvatWindow(self)
-
-    def setup_login_screen(self):
-        self.login_screen = LoginScreen(self)
-        self.to_next_page(self.login_screen)
-
-    # todo get this sorted copying jackson
-    def to_next_page(self, window):
-        window.create_account.clicked.connect(self.setup_create_account_screen())
-
-
-    def setup_create_account_screen(self):
-        self.create_account = CreateAccountScreen(self)
-
-    def setup_signin_screen(self):
-        self.signin_screen = SigninScreen(self)
