@@ -25,9 +25,9 @@ class CalculateSuvatWindow(QMainWindow, ui):
         # iterate through values, if '', leave else change to integer
         for i in range(len(self.values_suvat)):
             if not self.values_suvat[i] == '':
-                self.value_suvat[i] = int(self.values_suvat[i])
+                self.values_suvat[i] = int(self.values_suvat[i])
 
-        for i in range(len(self.values_suvat)):
+        for i in range(len(self.values_svt)):
             if not self.values_svt[i] == '':
                 self.values_svt[i] = int(self.values_svt[i])
 
