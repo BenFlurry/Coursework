@@ -78,6 +78,7 @@ class TeacherLanding(QMainWindow, ui):
 
     def edit_class(self):
         self.editing_class = True
+        self.class_remove = True
         self.label1.setText("enter each student name on a new line")
         self.label1.setHidden(False)
         self.input1.setHidden(True)
@@ -214,7 +215,6 @@ class TeacherLanding(QMainWindow, ui):
         for i in range(len(rows)):
             studentid = (int(self.table.item(int(rows[i]), 0).text()))
             self.c.execute('UPDATE students SET classid = ? WHERE userid = ?', ('', studentid))
-        print(f'{studentids = }')
         # reload the table
         self.load_students()
 
