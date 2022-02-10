@@ -34,12 +34,12 @@ class App(QMainWindow):
 
     def setup_login_screen(self):
         self.login_screen = LoginScreen(self)
-        # widget = QStackedWidget()
-        # widget.addWidget(self.login_screen)
-        # widget.show()
+        self.to_next_page(self.login_screen)
 
-    # def setup_error_message(self):
-    #     self.error_popup = ErrorPopup(self)
+    # todo get this sorted copying jackson
+    def to_next_page(self, window):
+        window.create_account.clicked.connect(self.setup_create_account_screen())
+
 
     def setup_create_account_screen(self):
         self.create_account = CreateAccountScreen(self)
