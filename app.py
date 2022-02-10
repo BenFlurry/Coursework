@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QLineEdit, QStackedWidget
 import sys
 from PyQt5 import uic
 from teacher_landing import TeacherLanding
@@ -17,11 +17,8 @@ class App(QMainWindow):
         # create and load the suvat entry window and show it
         # self.setup_suvat_svt_entry()
         # self.setup_vel_angle_entry()
-        # self.setup_login_screen()
-        # self.setup_error_message()
-        # self.setup_create_account_screen()
-        # self.setup_signin_screen()
-        self.setup_teacher_landing()
+        self.setup_login_screen()
+        # self.setup_teacher_landing()
         self.show()
 
         # set up event handlers
@@ -37,6 +34,9 @@ class App(QMainWindow):
 
     def setup_login_screen(self):
         self.login_screen = LoginScreen(self)
+        # widget = QStackedWidget()
+        # widget.addWidget(self.login_screen)
+        # widget.show()
 
     # def setup_error_message(self):
     #     self.error_popup = ErrorPopup(self)
