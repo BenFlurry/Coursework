@@ -6,6 +6,7 @@ import hashlib
 from data import Data
 ui = uic.loadUiType('signin_screen.ui')[0]
 
+
 '''
 radio button -> student (mutually exclusive)
 radio button -> teacher (mutually exclusive)
@@ -46,6 +47,7 @@ class SigninScreen(QMainWindow, ui):
             self.box.setStandardButtons(QMessageBox.Ok)
             self.box.setDefaultButton(QMessageBox.Ok)
             self.box.exec()
+
             # popup saying select an account
         self.un = self.username.text()
         self.pw = self.password.text()
@@ -109,10 +111,6 @@ class SigninScreen(QMainWindow, ui):
         self.box.setStandardButtons(QMessageBox.Ok)
         self.box.setDefaultButton(QMessageBox.Ok)
         self.box.exec()
-
-
-    def update_data(self):
-        pass
 
     def toggle_password(self):
         if self.show_password.isChecked():

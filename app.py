@@ -22,24 +22,34 @@ class App(QMainWindow):
 
         # set up event handlers
 
-    # todo get this sorted copying jackson
-    # todo based off of the input window name, add the handlers for that window using if statements
-    def to_next_page(self, window):
-        window.create_account.clicked.connect(self.setup_create_account_screen)
-        window.signin.clicked.connect(self.setup_login_screen)
+    def to_next_page(self, window_object, window_name):
+        if window_name == 'login':
+            window_object.create_account.clicked.connect(self.setup_create_account_screen)
+            window_object.signin.clicked.connect(self.setup_signin_screen)
+
+        elif window_name == 'create account':
+            window_object.back.clicked.connect(self.setup_login_screen)
+
+        elif window_name == 'signin':
+            # todo need to make it so it only swaps screens if the password is valid
+            # todo add another button which goes to the next page,
+            # rather than 1 button doing validation and page swapping
+            window_object.back.clicked.connect(self.setup_login_screen)
+
 
     def setup_login_screen(self):
         self.login_screen = LoginScreen(self)
-        self.to_next_page(self.login_screen)
+        self.to_next_page(self.login_screen, 'login')
 
     def setup_create_account_screen(self):
         self.login_screen.close()
         self.create_account = CreateAccountScreen(self)
-
+        self.to_next_page(self.create_account, 'create account')
 
     def setup_signin_screen(self):
         self.login_screen.close()
         self.signin_screen = SigninScreen(self)
+        self.to_next_page(self.signin_screen, 'signin')
 
     def setup_teacher_landing(self):
         self.teacher_landing = TeacherLanding(self)
