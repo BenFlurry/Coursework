@@ -128,6 +128,7 @@ class SigninScreen(QMainWindow, ui):
 
     def next_window(self):
         pass
+
         # todo function here
 
 
