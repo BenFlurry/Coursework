@@ -55,6 +55,7 @@ class SigninScreen(QMainWindow, ui):
 
 
     def check_un_pw(self):
+        self.box.setWindowTitle('Error')
         # first check if there is a matching email or password in the database
         self.c.execute('SELECT * FROM users WHERE username = ? or email = ?', (self.un, self.un))
         user = self.c.fetchall()
@@ -76,11 +77,14 @@ class SigninScreen(QMainWindow, ui):
                     # fetch the teacher id corresponding to the user id
                     self.c.execute('SELECT teacherid FROM teachers WHERE userid = ?', (user[0],))
                     teachers = self.c.fetchall()
+
                     if len(teachers) == 1:
                         self.data.set_teacherid(teachers[0][0])
                         msg = 'Valid account, welcome to the program'
+                        self.box.setWindowTitle('Welcome!')
                         self.box.setIcon(QMessageBox.Information)
-
+                        # todo have it run a new function changing the variable name of the signin button so when
+                        #  clicked again it can be pulled from the app class
                     else:
                         msg = 'A teacher does not exist with these credentials'
                     # update the data class with the user id
@@ -90,23 +94,27 @@ class SigninScreen(QMainWindow, ui):
                     self.c.execute('SELECT studentid FROM students WHERE userid = ?', (user[0],))
                     students = self.c.fetchall()
                     # if the student id exists
+
                     if len(students) == 1:
                         # add the student id to the data class
                         self.data.set_studentid(students[0][0])
+                        self.box.setWindowTitle('Welcome!')
                         msg = 'Valid account, welcome to the program'
                         self.box.setIcon(QMessageBox.Information)
+                        # todo here too
                     else:
                         msg = 'A student does not exist with these credentials'
+
                 else:
                     msg = 'The user does not exist for this account type'
+
             else:
+                self.password.setText('')
                 msg = 'Invalid password'
+
         else:
             msg = 'Invalid username or email'
 
-        # check they are a teacher or student
-
-        self.box.setWindowTitle('Error')
         self.box.setText(msg)
         self.box.setStandardButtons(QMessageBox.Ok)
         self.box.setDefaultButton(QMessageBox.Ok)
@@ -117,6 +125,10 @@ class SigninScreen(QMainWindow, ui):
             self.password.setEchoMode(QLineEdit.EchoMode.Normal)
         else:
             self.password.setEchoMode(QLineEdit.EchoMode.Password)
+
+    def next_window(self):
+        pass
+        # todo function here
 
 
 
