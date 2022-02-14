@@ -60,8 +60,12 @@ class App(QMainWindow):
         self.teacher_landing = TeacherLanding(self)
         self.teacher_landing.box.buttonClicked.connect(self.popup_status)
 
+    # todo when loading the simulator, load both windows and have a toggle button which hides or shows the
+    #  velangle/suvat windows
     def setup_vel_angle_entry(self):
+        self.current_screen = 'velangle sim'
         self.calculate_velangle_window = CalculateVelAngleWindow(self)
 
     def setup_suvat_svt_entry(self):
+        self.current_screen = 'suvat sim'
         self.calculate_suvat_window = CalculateSuvatWindow(self)
