@@ -33,9 +33,11 @@ class App(QMainWindow):
         elif window_name == 'signin':
             # todo need to make it so it only swaps screens if the password is valid
             # todo add another button which goes to the next page,
-            # rather than 1 button doing validation and page swapping
+            window_object.to_teacher.clicked.connect(self.setup_teacher_landing)
             window_object.back.clicked.connect(self.setup_login_screen)
 
+        elif window_name == 'teacher landing':
+            window_object.logout.clicked.connect(self.setup_login_screen)
 
     def setup_login_screen(self):
         self.login_screen = LoginScreen(self)
@@ -53,6 +55,8 @@ class App(QMainWindow):
 
     def setup_teacher_landing(self):
         self.teacher_landing = TeacherLanding(self)
+        self.signin_screen.close()
+        self.to_next_page(self.teacher_landing, 'teacher landing')
 
     def setup_vel_angle_entry(self):
         self.calculate_velangle_window = CalculateVelAngleWindow(self)

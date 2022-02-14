@@ -15,6 +15,7 @@ line edit -> username
 line edit -> password
 push button -> sign_in
 push button -> back
+push button -> to_teacher
 radio button -> show_password
 '''
 
@@ -29,6 +30,7 @@ class SigninScreen(QMainWindow, ui):
         self.conn = sqlite3.connect('database2.db', isolation_level=None)
         self.c = self.conn.cursor()
         self.valid = False
+        self.to_teacher.setHidden(True)
 
         self.box = QMessageBox()
         self.data = Data()
@@ -83,8 +85,7 @@ class SigninScreen(QMainWindow, ui):
                         msg = 'Valid account, welcome to the program'
                         self.box.setWindowTitle('Welcome!')
                         self.box.setIcon(QMessageBox.Information)
-                        # todo have it run a new function changing the variable name of the signin button so when
-                        #  clicked again it can be pulled from the app class
+                        self.to_teacher.setHidden(False)
                     else:
                         msg = 'A teacher does not exist with these credentials'
                     # update the data class with the user id
@@ -119,6 +120,7 @@ class SigninScreen(QMainWindow, ui):
         self.box.setStandardButtons(QMessageBox.Ok)
         self.box.setDefaultButton(QMessageBox.Ok)
         self.box.exec()
+        # todo change from pop out windows to changing a label
 
     def toggle_password(self):
         if self.show_password.isChecked():
