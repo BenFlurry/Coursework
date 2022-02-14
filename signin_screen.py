@@ -55,7 +55,10 @@ class SigninScreen(QMainWindow, ui):
 
 
     def check_un_pw(self):
+        # setup default popout box values
         self.box.setWindowTitle('Error')
+        self.box.setStandardButtons(QMessageBox.Ok)
+        self.box.setDefaultButton(QMessageBox.Ok)
         # first check if there is a matching email or password in the database
         self.c.execute('SELECT * FROM users WHERE username = ? or email = ?', (self.un, self.un))
         user = self.c.fetchall()
@@ -80,7 +83,7 @@ class SigninScreen(QMainWindow, ui):
 
                     if len(teachers) == 1:
                         self.data.set_teacherid(teachers[0][0])
-                        msg = 'Valid account, welcome to the program'
+                        msg = 'Valid account, continue to the program!'
                         self.box.setWindowTitle('Welcome!')
                         self.box.setIcon(QMessageBox.Information)
                         self.box.setStandardButtons(QMessageBox.Yes)
@@ -116,10 +119,8 @@ class SigninScreen(QMainWindow, ui):
             msg = 'Invalid username or email'
 
         self.box.setText(msg)
-        self.box.setStandardButtons(QMessageBox.Ok)
-        self.box.setDefaultButton(QMessageBox.Ok)
         self.box.exec()
-        # todo change from pop out windows to changing a label
+
 
     def toggle_password(self):
         if self.show_password.isChecked():

@@ -1,3 +1,5 @@
+from functools import partial
+
 from PyQt5.QtWidgets import QMainWindow, QLineEdit, QStackedWidget
 import sys
 from PyQt5 import uic
@@ -13,49 +15,50 @@ class App(QMainWindow):
     def __init__(self):
         # run the initialisation of the QMainWindow
         super().__init__()
-        # create and load the suvat entry window and show it
-        # self.setup_suvat_svt_entry()
-        # self.setup_vel_angle_entry()
+        # set current screen to login
+        self.current_screen = 'login'
+        # load the login screen
         self.setup_login_screen()
-        # self.setup_teacher_landing()
         self.show()
 
-        # set up event handlers
+    def popup_status(self, button_name):
+        button_name = button_name.text()
+        print(button_name)
+        if self.current_screen == 'signin':
+            if button_name == '&Yes':
+                self.setup_teacher_landing()
 
-    def to_next_page(self, window_object, window_name):
-        if window_name == 'login':
-            window_object.create_account.clicked.connect(self.setup_create_account_screen)
-            window_object.signin.clicked.connect(self.setup_signin_screen)
+        # todo add the other screens that require a popout button checking here
+        elif self.current_screen == 'teacher landing':
+            if button_name == '&Yes':
+                self.setup_login_screen()
 
-        elif window_name == 'create account':
-            window_object.back.clicked.connect(self.setup_login_screen)
-
-        elif window_name == 'signin':
-            # todo pull the name of the button clicked, if yes then go to program otherwise do nothing
-            window_object.box.buttonClicked.connect(self.setup_teacher_landing)
-            window_object.back.clicked.connect(self.setup_login_screen)
-
-        elif window_name == 'teacher landing':
-            window_object.box.buttonClicked.connect(self.setup_login_screen)
-
-    def setup_login_screen(self):
-        self.login_screen = LoginScreen(self)
-        self.to_next_page(self.login_screen, 'login')
-
-    def setup_create_account_screen(self):
-        self.login_screen.close()
-        self.create_account = CreateAccountScreen(self)
-        self.to_next_page(self.create_account, 'create account')
-
+    # todo might have to pass in the dimensions of the previous window so window size is maintained through windows
+    # set up event handlers
     def setup_signin_screen(self):
+        self.current_screen = 'signin'
         self.login_screen.close()
         self.signin_screen = SigninScreen(self)
-        self.to_next_page(self.signin_screen, 'signin')
+        self.signin_screen.box.buttonClicked.connect(self.popup_status)
+        self.signin_screen.back.clicked.connect(self.setup_login_screen)
+
+    def setup_login_screen(self):
+        self.current_screen = 'login'
+        self.login_screen = LoginScreen(self)
+        self.login_screen.create_account.clicked.connect(self.setup_create_account_screen)
+        self.login_screen.signin.clicked.connect(self.setup_signin_screen)
+
+    def setup_create_account_screen(self):
+        self.current_screen = 'create account'
+        self.login_screen.close()
+        self.create_account = CreateAccountScreen(self)
+        self.create_account.back.clicked.connect(self.setup_login_screen)
 
     def setup_teacher_landing(self):
-        self.teacher_landing = TeacherLanding(self)
+        self.current_screen = 'teacher landing'
         self.signin_screen.close()
-        self.to_next_page(self.teacher_landing, 'teacher landing')
+        self.teacher_landing = TeacherLanding(self)
+        self.teacher_landing.box.buttonClicked.connect(self.popup_status)
 
     def setup_vel_angle_entry(self):
         self.calculate_velangle_window = CalculateVelAngleWindow(self)

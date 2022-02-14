@@ -68,7 +68,7 @@ class TeacherLanding(QMainWindow, ui):
         self.box.setIcon(QMessageBox.Question)
         self.box.setWindowTitle('LogOut?')
         self.box.setText('Are you sure you wish to log out?')
-        self.box.setStandardButtons(QMessageBox.Yes)
+        self.box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         self.box.setDefaultButton(QMessageBox.Yes)
         self.box.exec()
 
@@ -129,7 +129,6 @@ class TeacherLanding(QMainWindow, ui):
                     INNER JOIN users on teachers.userid = users.userid''')
 
         rows = self.c.fetchall()
-        print(rows)
         # add the headings
         # headings = ["class id", "teacher name", "class name", "students"]
         headings = ["class id", "teacher name", "class name"]
