@@ -35,7 +35,7 @@ class TeacherLanding(QMainWindow, ui):
         self.manage_class.clicked.connect(self.edit_class)
         self.new_class.clicked.connect(self.create_new_class)
         # self.to_simulator.clicked.connect()
-        # self.logout.clicked.connect()
+        self.logout.clicked.connect(self.to_login)
         self.save_changes.clicked.connect(self.save)
         self.view_class.clicked.connect(self.show_class)
         self.delete_class.clicked.connect(self.remove)
@@ -60,8 +60,17 @@ class TeacherLanding(QMainWindow, ui):
         self.c = self.conn.cursor()
         self.load_classes()
 
+        self.box = QMessageBox()
         self.data = Data()
         self.data.test()
+
+    def to_login(self):
+        self.box.setIcon(QMessageBox.Question)
+        self.box.setWindowTitle('LogOut?')
+        self.box.setText('Are you sure you wish to log out?')
+        self.box.setStandardButtons(QMessageBox.Yes)
+        self.box.setDefaultButton(QMessageBox.Yes)
+        self.box.exec()
 
     def create_new_class(self):
         self.creating_class = True

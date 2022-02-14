@@ -15,7 +15,6 @@ line edit -> username
 line edit -> password
 push button -> sign_in
 push button -> back
-push button -> to_teacher
 radio button -> show_password
 '''
 
@@ -30,7 +29,6 @@ class SigninScreen(QMainWindow, ui):
         self.conn = sqlite3.connect('database2.db', isolation_level=None)
         self.c = self.conn.cursor()
         self.valid = False
-        self.to_teacher.setHidden(True)
 
         self.box = QMessageBox()
         self.data = Data()
@@ -85,7 +83,8 @@ class SigninScreen(QMainWindow, ui):
                         msg = 'Valid account, welcome to the program'
                         self.box.setWindowTitle('Welcome!')
                         self.box.setIcon(QMessageBox.Information)
-                        self.to_teacher.setHidden(False)
+                        self.box.setStandardButtons(QMessageBox.Yes)
+                        self.box.setDefaultButton(QMessageBox.Yes)
                     else:
                         msg = 'A teacher does not exist with these credentials'
                     # update the data class with the user id

@@ -31,13 +31,12 @@ class App(QMainWindow):
             window_object.back.clicked.connect(self.setup_login_screen)
 
         elif window_name == 'signin':
-            # todo need to make it so it only swaps screens if the password is valid
-            # todo add another button which goes to the next page,
-            window_object.to_teacher.clicked.connect(self.setup_teacher_landing)
+            # todo pull the name of the button clicked, if yes then go to program otherwise do nothing
+            window_object.box.buttonClicked.connect(self.setup_teacher_landing)
             window_object.back.clicked.connect(self.setup_login_screen)
 
         elif window_name == 'teacher landing':
-            window_object.logout.clicked.connect(self.setup_login_screen)
+            window_object.box.buttonClicked.connect(self.setup_login_screen)
 
     def setup_login_screen(self):
         self.login_screen = LoginScreen(self)

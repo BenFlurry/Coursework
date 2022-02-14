@@ -19,7 +19,7 @@ class LoginScreen(QMainWindow, ui):
         self.setupUi(app_window)
 
         # self.signin.clicked.connect(self.load_signin)
-        self.create_account.clicked.connect(self.load_create_account)
+        # self.create_account.clicked.connect(self.load_create_account)
         self.show()
 
     # def load_signin(self):
@@ -32,6 +32,6 @@ class LoginScreen(QMainWindow, ui):
         # stack.addWidget(signin_window.stackedWidget)
         # stack.setCurrentIndex(stack.currentIndex() +1)
 
-    def load_create_account(self):
-        self.create_account_window = CreateAccountScreen(self)
-        # self.show()
+    # def load_create_account(self):
+    #     self.create_account_window = CreateAccountScreen(self)
+    #     # self.show()
