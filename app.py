@@ -35,6 +35,10 @@ class App(QMainWindow):
             if button_name == '&Yes':
                 self.setup_login_screen()
 
+        elif self.current_screen == 'create account':
+            if button_name == '&Yes':
+                self.setup_signin_screen()
+
     # closes any currently opened screens
     def close_screens(self):
         for i in range(len(self.open_screens)):
@@ -69,6 +73,7 @@ class App(QMainWindow):
         self.open_screens.append(self.create_account)
         # add button handlers
         self.create_account.back.clicked.connect(self.setup_login_screen)
+        self.create_account.box.buttonClicked.connect(self.popup_status)
 
     def setup_teacher_landing(self):
         self.current_screen = 'teacher landing'

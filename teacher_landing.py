@@ -64,6 +64,8 @@ class TeacherLanding(QMainWindow, ui):
         self.data = Data()
         self.data.test()
 
+        # fixme deleting students does not update the table again
+
     def to_login(self):
         self.box.setIcon(QMessageBox.Question)
         self.box.setWindowTitle('LogOut?')

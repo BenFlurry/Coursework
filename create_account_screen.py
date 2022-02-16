@@ -33,17 +33,19 @@ class CreateAccountScreen(QMainWindow, ui):
         self.back.clicked.connect(self.load_signin)
         self.show_password.clicked.connect(self.toggle_password)
         self.details = {}
+        self.conn = sqlite3.connect('database2.db', isolation_level=None)
+        self.c = self.conn.cursor()
         # self.account_type = 'teacher'
         # self.student = False
         # self.teacher = False
-        # self.email = ''
+        # self.email = ''\\\\\\\\
         # self.username = ''
         # self.password1 = ''
         # self.password2 = ''
         # self.valid_email = False
         # self.valid_password = False
         self.box = QMessageBox()
-        self.box.Icon(QMessageBox.Critical)
+        self.box.setIcon(QMessageBox.Critical)
 
     def load_signin(self):
         pass
@@ -58,7 +60,6 @@ class CreateAccountScreen(QMainWindow, ui):
         self.password1 = self.qpassword1.text()
         self.password2 = self.qpassword2.text()
         self.name = self.qname.text()
-
         self.account_type = ''
         self.check_account_type()
         self.check_username()
@@ -103,6 +104,7 @@ class CreateAccountScreen(QMainWindow, ui):
         print(self.password)
 
     def check_password(self):
+        self.valid_password = False
         # check the 2 entered passwords are the same
         if self.password1 == self.password2:
             password = self.password1
@@ -114,8 +116,6 @@ class CreateAccountScreen(QMainWindow, ui):
                     if any(letter.isdigit() for letter in password):
                         if any(letter.isupper() for letter in password):
                             self.valid_password = True
-                            error_message = 'valid password'
-                            self.box.setIcon(QMessageBox.Information)
                             # hash the password using SHA hash
                             self.hash_password()
                             self.details['password'] = self.password
@@ -129,47 +129,55 @@ class CreateAccountScreen(QMainWindow, ui):
                 error_message = 'password has to be 8 or more characters'
         else:
             error_message = 'enter matching passwords'
-        self.box.setWindowTitle('Error')
-        self.box.setText('Password error:')
-        self.box.setInformativeText(error_message)
-        self.box.setStandardButtons(QMessageBox.Ok)
-        self.box.setDefaultButton(QMessageBox.Ok)
-        self.box.exec()
+        # display invalid password popout
+        if not self.valid_password:
+            self.box.setWindowTitle('Error')
+            self.box.setText('Password error:')
+            self.box.setIcon(QMessageBox.Critical)
+            self.box.setInformativeText(error_message)
+            self.box.setStandardButtons(QMessageBox.Ok)
+            self.box.setDefaultButton(QMessageBox.Ok)
+            self.box.exec()
 
     # when show_password button is pressed, run the function to change the password echo
     def toggle_password(self):
         if self.show_password.isChecked():
-            self.password1.setEchoMode(QLineEdit.EchoMode.Normal)
-            self.password2.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.qpassword1.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.qpassword2.setEchoMode(QLineEdit.EchoMode.Normal)
 
         else:
-            self.password1.setEchoMode(QLineEdit.EchoMode.Password)
-            self.password2.setEchoMode(QLineEdit.EchoMode.Password)
+            self.qpassword1.setEchoMode(QLineEdit.EchoMode.Password)
+            self.qpassword2.setEchoMode(QLineEdit.EchoMode.Password)
 
     def add_user(self):
         try:
-            self.conn = sqlite3.connect('database2.db', isolation_level=None)
-            self.c = self.conn.cursor()
-            query = 'INSERT INTO users(userid, username, email, password, name) VALUES(null, :username, :email, ' \
+            query = 'INSERT INTO users VALUES(null, :username, :email, ' \
                     ':password, :name)'
             print(self.details)
             self.c.execute(query, self.details)
             print('new user account created')
-
             # fetch the userid from the created account
             self.c.execute('SELECT userid FROM users WHERE username = ?', (self.details['username'],))
-            userid = self.c.fetchall()
+            userid = self.c.fetchall()[0][0]
+            print(userid)
             if self.account_type == 'teacher':
                 # and add to teachers table if a teacher
                 self.c.execute('INSERT INTO teachers VALUES(null, ?)', (userid,))
             elif self.account_type == 'student':
                 # and add to students table if a student
-                self.c.execute('INSERT INTO teachers VALUES(null, ?, null)', (userid,))
+                # fixme didnt work for some reason
+                self.c.execute('INSERT INTO students VALUES(null, ?, null)', (userid,))
+            self.box.setWindowTitle('Error')
+            self.box.setText('Continue to sign in')
+            self.box.setIcon(QMessageBox.Information)
+            self.box.setStandardButtons(QMessageBox.Yes)
+            self.box.setDefaultButton(QMessageBox.Yes)
+            self.box.exec()
 
         except sqlite3.IntegrityError as e:
             self.box.setWindowTitle('Error')
             self.box.setText('Your username or email already exists')
-            self.box.setInformativeText(e)
+            self.box.setInformativeText(str(e))
             self.box.setIcon(QMessageBox.Critical)
             self.box.setStandardButtons(QMessageBox.Ok)
             self.box.setDefaultButton(QMessageBox.Ok)
