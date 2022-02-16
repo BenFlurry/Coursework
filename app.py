@@ -15,6 +15,8 @@ class App(QMainWindow):
     def __init__(self):
         # run the initialisation of the QMainWindow
         super().__init__()
+        # list of all the open screens, so when another screen is open the previous ones can be closed
+        self.open_screens = []
         # set current screen to login
         self.current_screen = 'login'
         # load the login screen
@@ -33,39 +35,67 @@ class App(QMainWindow):
             if button_name == '&Yes':
                 self.setup_login_screen()
 
+    # closes any currently opened screens
+    def close_screens(self):
+        for i in range(len(self.open_screens)):
+            self.open_screens[i].close()
+            self.open_screens.pop(i)
+
     # todo might have to pass in the dimensions of the previous window so window size is maintained through windows
     # set up event handlers
     def setup_signin_screen(self):
         self.current_screen = 'signin'
-        self.login_screen.close()
+        self.close_screens()
         self.signin_screen = SigninScreen(self)
+        self.open_screens.append(self.signin_screen)
         self.signin_screen.box.buttonClicked.connect(self.popup_status)
         self.signin_screen.back.clicked.connect(self.setup_login_screen)
 
     def setup_login_screen(self):
         self.current_screen = 'login'
         self.login_screen = LoginScreen(self)
+        # open and close screens
+        self.close_screens()
+        self.open_screens.append(self.login_screen)
+        # add button handlers
         self.login_screen.create_account.clicked.connect(self.setup_create_account_screen)
         self.login_screen.signin.clicked.connect(self.setup_signin_screen)
 
     def setup_create_account_screen(self):
         self.current_screen = 'create account'
-        self.login_screen.close()
         self.create_account = CreateAccountScreen(self)
+        # open and close screens
+        self.close_screens()
+        self.open_screens.append(self.create_account)
+        # add button handlers
         self.create_account.back.clicked.connect(self.setup_login_screen)
 
     def setup_teacher_landing(self):
         self.current_screen = 'teacher landing'
-        self.signin_screen.close()
         self.teacher_landing = TeacherLanding(self)
+        # open and close screens
+        self.close_screens()
+        self.open_screens.append(self.teacher_landing)
+        # add button handlers
         self.teacher_landing.box.buttonClicked.connect(self.popup_status)
+        self.teacher_landing.to_simulator.clicked.connect(self.setup_vel_angle_entry)
 
-    # todo when loading the simulator, load both windows and have a toggle button which hides or shows the
-    #  velangle/suvat windows
     def setup_vel_angle_entry(self):
         self.current_screen = 'velangle sim'
-        self.calculate_velangle_window = CalculateVelAngleWindow(self)
+        self.velangle_window = CalculateVelAngleWindow(self)
+        # open and close screens
+        self.close_screens()
+        self.open_screens.append(self.velangle_window)
+        # add button handlers
+        self.velangle_window.to_suvat.clicked.connect(self.setup_suvat_svt_entry)
 
     def setup_suvat_svt_entry(self):
         self.current_screen = 'suvat sim'
-        self.calculate_suvat_window = CalculateSuvatWindow(self)
+        self.suvat_window = CalculateSuvatWindow(self)
+        # open screens
+        self.close_screens()
+        self.open_screens.append(self.suvat_window)
+        # add button handlers
+        self.suvat_window.to_velangle.clicked.connect(self.setup_vel_angle_entry)
+
+

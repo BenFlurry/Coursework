@@ -89,7 +89,7 @@ class CreateAccountScreen(QMainWindow, ui):
         except EmailNotValidError as e:
             self.box.setWindowTitle('Error')
             self.box.setText('Invalid email')
-            self.box.setInformativeText(e)
+            self.box.setInformativeText(str(e))
             self.box.setStandardButtons(QMessageBox.Ok)
             self.box.setDefaultButton(QMessageBox.Ok)
             self.box.exec()

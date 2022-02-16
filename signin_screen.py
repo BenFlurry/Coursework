@@ -104,7 +104,6 @@ class SigninScreen(QMainWindow, ui):
                         self.box.setWindowTitle('Welcome!')
                         msg = 'Valid account, welcome to the program'
                         self.box.setIcon(QMessageBox.Information)
-                        # todo here too
                     else:
                         msg = 'A student does not exist with these credentials'
 
@@ -127,12 +126,6 @@ class SigninScreen(QMainWindow, ui):
             self.password.setEchoMode(QLineEdit.EchoMode.Normal)
         else:
             self.password.setEchoMode(QLineEdit.EchoMode.Password)
-
-    def next_window(self):
-        pass
-
-        # todo function here
-
 
 
 
