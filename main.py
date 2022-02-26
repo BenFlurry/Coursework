@@ -1,9 +1,6 @@
-from app import App
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication
 import sys
-import os
-import traceback
+from PyQt5.QtWidgets import QApplication
+from app import App
 
 
 # print errors into command line

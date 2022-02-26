@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit, QMessageBox, QApplication, QTableWidgetItem
 from PyQt5 import uic, QtWidgets
-from suvat_lib2 import *
+from suvat_lib import *
 import sqlite3
 import hashlib
 import sys
@@ -64,7 +64,6 @@ class TeacherLanding(QMainWindow, ui):
         self.data = Data()
         self.data.test()
 
-        # fixme deleting students does not update the table again
 
     def to_login(self):
         self.box.setIcon(QMessageBox.Question)
@@ -184,10 +183,10 @@ class TeacherLanding(QMainWindow, ui):
             # update the students table adding their class
             self.c.execute('UPDATE students SET classid = ? WHERE userid = ?', (classid, userid))
 
-
     def show_class(self):
         # set removal of class to false so the function to remove a student is called
         self.class_remove = False
+        # fixme deleting students does not update the table again
         rows = [index.row() for index in self.table.selectedIndexes()]
         # take the classid value in the table from the selected rows
         self.classid = int(self.table.item(int(rows[0]), 0).text())

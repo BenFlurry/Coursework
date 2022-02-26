@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit, QStackedWidget
 from PyQt5 import uic
-from suvat_lib2 import *
+from suvat_lib import *
 from signin_screen import SigninScreen
 from create_account_screen import CreateAccountScreen
 import time

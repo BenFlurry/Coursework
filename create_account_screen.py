@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit, QMessageBox
 from PyQt5 import uic
-from suvat_lib2 import *
+from suvat_lib import *
 from email_validator import validate_email, EmailNotValidError
 from signin_screen import SigninScreen
 import string
@@ -165,7 +165,6 @@ class CreateAccountScreen(QMainWindow, ui):
                 self.c.execute('INSERT INTO teachers VALUES(null, ?)', (userid,))
             elif self.account_type == 'student':
                 # and add to students table if a student
-                # fixme didnt work for some reason
                 self.c.execute('INSERT INTO students VALUES(null, ?, null)', (userid,))
             self.box.setWindowTitle('Error')
             self.box.setText('Continue to sign in')

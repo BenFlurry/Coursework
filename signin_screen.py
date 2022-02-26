@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit, QMessageBox
 from PyQt5 import uic
-from suvat_lib2 import *
+from suvat_lib import *
 import sqlite3
 import hashlib
 from data import Data

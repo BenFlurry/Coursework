@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit
 from PyQt5 import uic
-from suvat_lib2 import *
+from suvat_lib import *
 
 ui = uic.loadUiType('suvatcalculator.ui')[0]
 
@@ -31,7 +31,21 @@ class CalculateSuvatWindow(QMainWindow, ui):
             if not self.values_svt[i] == '':
                 self.values_svt[i] = int(self.values_svt[i])
 
-        self.start_height = int(self.start_height)
+        if self.start_height != '':
+            self.start_height = int(self.start_height)
+        elif self.start_height == '':
+            self.start_height = 0
+
+        # make sure t values are the same
+        ty = self.ty.text()
+        tx = self.tx.text()
+        if tx != '' and ty == '':
+            self.values_suvat[4] = tx
+        elif ty != '' and tx == '':
+            self.values_svt[2] = ty
+
+            # todo error messages in suvat
+
         # run the main function from suvat library
         graph_main_suvat(self.values_suvat, self.values_svt, self.start_height)
 

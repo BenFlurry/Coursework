@@ -18,9 +18,10 @@ class App(QMainWindow):
         # list of all the open screens, so when another screen is open the previous ones can be closed
         self.open_screens = []
         # set current screen to login
-        self.current_screen = 'login'
+
         # load the login screen
-        self.setup_login_screen()
+        self.setup_teacher_landing()
+        # self.setup_login_screen()
         self.show()
 
     def popup_status(self, button_name):
@@ -30,7 +31,6 @@ class App(QMainWindow):
             if button_name == '&Yes':
                 self.setup_teacher_landing()
 
-        # todo add the other screens that require a popout button checking here
         elif self.current_screen == 'teacher landing':
             if button_name == '&Yes':
                 self.setup_login_screen()
