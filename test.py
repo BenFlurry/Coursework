@@ -13,9 +13,23 @@ v2(y-h) -v(ux)) - 0.5x = 0
 
 case where t can be found from svt and then used in suvat or vice versa
 """
-y0 = 6
-print(y0)
+x = 3,
+print(type(x))
 
-import matplotlib.pyplot as plt
-plt.plot([1,2,3], [2,4,6])
-plt.show()
+# # if the calculated variable is t and both positive, account for both values
+# if check_variable == 'ty' and found_suvat[0] > 0 and found_suvat[1] > 0:
+#     if found_suvat[0] == check_value[0] and found_suvat[1] == check_value[1]:
+#         return True, found_suvat[0], found_suvat[1]
+#     elif found_suvat[0] == check_value[1] and found_suvat[1] == check_value[0]:
+#         return True, found_suvat[0], found_suvat[1]
+#     else:
+#         return False, found_suvat[0], found_suvat[1]
+#
+# # otherwise account for only 1 value input
+# else:
+#     if found_suvat[0] == check_value:
+#         return True, found_suvat[0]
+#     else:
+#         return False, found_suvat
+
+
