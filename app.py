@@ -20,7 +20,8 @@ class App(QMainWindow):
         # set current screen to login
 
         # load the login screen
-        self.setup_teacher_landing()
+        # self.setup_teacher_landing()
+        self.setup_suvat_svt_entry()
         # self.setup_login_screen()
         self.show()
 

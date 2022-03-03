@@ -6,7 +6,6 @@ import math
 # VERTICAL COMPONENT
 # 1: s = ut + 0.5at^2
 def suat(s, u, a, t, to_be_found):
-    print(to_be_found)
     if to_be_found == 's':
         found = (u * t) + ((a * (t ** 2)) / 2)
     elif to_be_found == 'u':
@@ -17,7 +16,6 @@ def suat(s, u, a, t, to_be_found):
         found = ((-u + np.sqrt(u ** 2 + 2 * a * s)) / a, (-u - np.sqrt(u ** 2 + 2 * a * s)) / a)
         return found
     else:
-        print(f'{found = }')
         return found,
 
 # 2: s = vt - 0.5at^2
@@ -29,7 +27,6 @@ def svat(s, v, a, t, to_be_found):
     elif to_be_found == 'a':
         found = 2 * (-s + v * t) / t ** 2
     if to_be_found == 't':
-        print('here')
         found = ((v + np.sqrt(v ** 2 - 2 * a * s)) / a, (v - np.sqrt(v ** 2 - 2 * a * s)) / a)
         return found
     else:
@@ -249,7 +246,7 @@ def find_sua(values, start_height):
     # return the list of suvat values
     return [s, u, v, a, t]
 
-
+# todo account for case where there can be 2 v's
 # finds the value of v from svt
 def find_v(values):
     # set unknown variables to None to allow to convert to int
@@ -409,14 +406,13 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
     else:
         has_height = True
 
-    # todo use *args to pass suvat into functions
     # todo have all inputs be strings rather than ints and empty strings
     # Case 1: solve suvat on its own
     if num_of_suvat >= 3 and index <= 4:
         suvat = inp_suvat
         for i in range(5):
             if suvat_mask[i] == 1:
-                suvat[i] = inp_suvat[i]
+                suvat[i] = int(inp_suvat[i])
             if i == index:
                 suvat[i] = 0
             elif suvat[i] == '':
@@ -451,6 +447,8 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
     elif num_of_svt >= 2 and 5 <= index <= 7:
         svt = inp_svt
         for i in range(3):
+            if svt_mask[i] == 1:
+                svt = int(inp_svt)
             if i == index:
                 svt[i] = 0
             elif svt[i] == '':
@@ -461,64 +459,8 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
         else:
             return False, found_svt
 
-    # Case 3: svt subbed into suvat
-    elif num_of_suvat >= 3 and num_of_svt == 1 and 5 <= index <= 7:
-        # convert empty string to none
-        for i in range(5):
-            if inp_suvat[i] == '':
-                inp_suvat[i] = None
-        for i in range(3):
-            if inp_svt[i] == '':
-                inp_svt = None
-        x, u, _, a, _ = inp_suvat
-        y, v, _ = inp_svt
-        h = height
-
-        # need to have x, u, a and y or v
-        # if x doesnt exist
-        if suvat_mask[0] != 1:
-            x = 0
-            x = choose_suvat_eqn(*inp_suvat, 's')
-        # if u doesnt exist
-        elif suvat_mask[1] != 1:
-            u = 0
-            u = choose_suvat_eqn(*inp_suvat, 'u')
-        # if a doesnt exist
-        elif suvat_mask[3] != 1:
-            a = 0
-            a = choose_suvat_eqn(*inp_suvat, 'a')
-
-        # for the x quadratic eqn
-        if svt_mask[0] == 1:
-            alpha = 0.5*a / (v**2)
-            beta = u/v
-            gamma = -y + h
-            # find roots
-            roots = np.roots([alpha, beta, gamma]) - h
-            if roots[0] == check_value[0] and roots[1] == check_value[1]:
-                return True
-            elif roots[0] == check_value[1] and roots[1] == check_value[0]:
-                return True
-            else:
-                return False
-
-        # for the v quadratic eqn
-        if svt_mask[1] == 1:
-            alpha = y - h
-            beta = -u*x
-            gamma = -0.5*x*a
-            # find roots
-            roots = np.roots([alpha, beta, gamma])
-            if roots[0] == check_value[0] and roots[1] == check_value[1]:
-                return True
-            elif roots[0] == check_value[1] and roots[1] == check_value[0]:
-                return True
-            else:
-                return False
-
-    # todo check for adding height to a none type y value
-    # Case 4: svt then suvat
-    elif num_of_suvat == 2 and num_of_svt == 2 and svt_mask == [1, 1, 0] and index <= 3:
+    # Case 3: svt then suvat
+    elif num_of_suvat == 2 and num_of_svt == 2 and svt_mask == [1, 1, 0] and index <= 3 and suvat_mask[4] != 1:
         # find t from svt
         b, n, m = inp_svt
         t = b / n
@@ -529,6 +471,8 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
         for i in range(4):
             if suvat[i] == '':
                 suvat[i] = None
+            else:
+                suvat[i] = int(suvat[i])
         suvat[index] = 0
         # add starting height if given
         if has_height and suvat[0] is not None and check_variable != 'sy':
@@ -544,24 +488,115 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
         else:
             return False, actual_value
 
-    # Case 5: suvat then svt
-    elif num_of_suvat == 3 and num_of_svt == 1 and 5 <= index <= 6:
+    # Case 4: suvat then svt
+    elif num_of_suvat == 3 and num_of_svt == 1 and 5 <= index <= 6 and svt_mask[2] != 1:
         suvat = inp_suvat
+        # handle nones
         for i in range(4):
             if suvat[i] == '':
                 suvat[i] = None
+            else:
+                suvat[i] = int(suvat[i])
+        # find t from suvat
         t = choose_suvat_eqn(*suvat, 't')
-        e, f, g = inp_svt
-        if svt_mask == [1, 0, 0]:
-            for i in range(2):
-                actual_value = svt_equation(e, f, t[i], 'v')[0]
+        # if there are 2 valid values for t
+        svt = inp_svt
+        for i in range(3):
+            if svt[i] == '':
+                svt[i] = None
+            else:
+                svt[i] = int(svt[i])
+        e, f, _ = svt
+        if t[0] > 0 and t[1] > 0:
+            # check which variable is missing and calculate the value
+            if svt_mask == [1, 0, 0]:
+                actual_value = (to_3sf(svt_equation(e, f, t[0], 'v')[0]),
+                                to_3sf(svt_equation(e, f, t[1], 'v')[0]))
+            else:
+                actual_value = (to_3sf(svt_equation(e, f, t[0], 's')[0]),
+                                to_3sf(svt_equation(e, f, t[1], 's')[0]))
+            # check if correct and return
+            if actual_value == check_value and type(check_value) == tuple:
+                return True, actual_value[0], actual_value[1]
+            else:
+                return False, actual_value[0], actual_value[1]
+        # if there is only 1 value of t
         else:
-            for i in range(2):
-                actual_value = svt_equation(e, f, t[i], 's')[0]
-        if actual_value == check_value:
-            return True
-        else:
-            return False
+            # take the highest value
+            t = max(t[0], t[1])
+            # and calculate the missing variable
+            if svt_mask == [1, 0, 0]:
+                actual_value = (to_3sf(svt_equation(e, f, t, 'v')[0]))
+            else:
+                actual_value = (to_3sf(svt_equation(e, f, t, 's')[0]))
+            # and check if its correct
+            if actual_value == check_value:
+                return True, actual_value
+            else:
+                return False, actual_value
+
+    # Case 5: svt subbed into suvat with only svt[t] given
+    elif num_of_suvat >= 3 and num_of_svt == 1 and 5 <= index <= 6 and svt_mask == [0, 0, 1]:
+        # convert empty string to none
+        for i in range(5):
+            if inp_suvat[i] == '':
+                inp_suvat[i] = None
+            else:
+                inp_suvat[i] = int(inp_suvat[i])
+        for i in range(3):
+            if inp_svt[i] == '':
+                inp_svt = None
+            else:
+                inp_svt[i] = int(inp_svt[i])
+        # unpack relevant inputs
+        x, u, _, a, _ = inp_suvat
+        y, v, _ = inp_svt
+        h = height
+        # if no start height is given, assume 0
+        if h == '':
+            h = 0
+
+        # need to have x, u, a and y or v so find them if not given
+        # if x doesnt exist
+        if suvat_mask[0] != 1:
+            x = 0
+            x = choose_suvat_eqn(*inp_suvat, 's')
+        # if u doesnt exist
+        elif suvat_mask[1] != 1:
+            u = 0
+            u = choose_suvat_eqn(*inp_suvat, 'u')
+        # if a doesnt exist
+        elif suvat_mask[3] != 1:
+            a = 0
+            a = choose_suvat_eqn(*inp_suvat, 'a')
+
+        # for the x quadratic eqn
+        if svt_mask[0] == 1:
+            alpha = 0.5 * a / (v ** 2)
+            beta = u / v
+            gamma = -y + h
+            # find roots
+            roots = np.roots([alpha, beta, gamma]) - h
+            if roots[0] == check_value[0] and roots[1] == check_value[1]:
+                return True, roots[0], roots[1]
+            elif roots[0] == check_value[1] and roots[1] == check_value[0]:
+                return True, roots[1], roots[0]
+            else:
+                return False, roots[0], roots[1]
+
+        # for the v quadratic eqn
+        if svt_mask[1] == 1:
+            alpha = y - h
+            beta = -u * x
+            gamma = -0.5 * x * a
+            # find roots
+            roots = np.roots([alpha, beta, gamma])
+            if roots[0] == check_value[0] and roots[1] == check_value[1] and type(check_value) == tuple:
+                return True, roots[0], roots[1]
+            elif roots[0] == check_value[1] and roots[1] == check_value[0] and type(check_value) == tuple:
+                return True, roots[1], roots[0]
+            else:
+                return False, roots[0], roots[1]
 
 
 def tests():
@@ -579,14 +614,19 @@ def tests():
     print('calculated value = ', end='')
     print(verify_suvat(*inputs))
 
-    # print('test 3a: svt into suvat solve for x')
-    # print('test 3b: svt into suvat solve for v')
-    print('\ntest 4: svt then suvat')
+    print('\ntest 3: svt then suvat')
     inputs = ['', 10, '', -10, ''], [6, 2, ''], 15, 'vy', -20
     print(inputs)
+    print(f'check value = {inputs[4]}')
     print('calculated value = ', end='')
     print(verify_suvat(*inputs))
-    # print('test 5: suvat then svt')
+
+    print('\ntest 4: suvat then svt')
+    inputs = [-10, 20, '', -10, ''], ['', 1, ''], 15, 'vx', 0.156
+    print(inputs)
+    print(f'check value = {inputs[4]}')
+    print('calculated value = ', end='')
+    print(verify_suvat(*inputs))
 
 tests()
 
