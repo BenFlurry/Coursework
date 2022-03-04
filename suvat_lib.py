@@ -288,6 +288,7 @@ def graph_main_suvat(values_suvat, values_svt, start_height):
     if values_svt[1] == '':
         # find v
         values_svt = find_v(values_svt)
+    # todo have values_svt return a tuple, then check the length of it to determine whether 1 or 2 lines to plot
     # create list of coords
     coords = para_hor_ver_arr(values_suvat, values_svt, start_height)
     print(coords)
@@ -373,15 +374,13 @@ def style_graphs():
     # axis() -> set to on to add x and y axis
     pass
 
-# todo IMPLEMENT THIS ROUNDING FUNCTION TO ALL FUNCTIONS
+
 # round values to 3sf
 def to_3sf(value):
-    return round(value, 2 - int(math.floor(math.log10(abs(value)))))
+    return round(value,  - int(math.floor(math.log10(abs(value)))))
 
 
-
-
-# todo create a function which validates the input of suvat values
+# todo  make the calculation of each case its own function to be able to be called elsewhere
 # input validate as a string for either 
 def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
     variables = ['sy', 'uy', 'vy', 'ay', 'ty', 'sx', 'vx', 'tx', 'h']
@@ -406,7 +405,6 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
     else:
         has_height = True
 
-    # todo have all inputs be strings rather than ints and empty strings
     # Case 1: solve suvat on its own
     if num_of_suvat >= 3 and index <= 4:
         suvat = inp_suvat
@@ -628,25 +626,26 @@ def tests():
     print('calculated value = ', end='')
     print(verify_suvat(*inputs))
 
+
 tests()
+
 
 def verify_velangle(velocity, angle, acceleration, height, x, y):
     pass
 
 
-# todo create a function to store the values from a simulation into sql
+# create a function to store the values from a simulation into sql
 def store_values():
     data = Data()
     userid = data.get_userid()
 
 
-
-# todo create a function to store a question with the values that have to be worked out
+# create a function to store a question with the values that have to be worked out
 def store_question():
     pass
 
 
-# todo create a function to calculate the score for a student and save it to sql
+# create a function to calculate the score for a student and save it to sql
 def calculate_score():
     pass
 
