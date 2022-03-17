@@ -300,7 +300,7 @@ def graph_main_suvat(values_suvat, values_svt, start_height):
 # equation to take in x, velocity angle, acceleration and start height and return the y value for each x passed in
 def vel_angle_eqn(x, velocity, angle, acceleration, start_height):
     # equation to find y with respect to x
-    y = (np.tan(angle) * x) + ((acceleration * (x ** 2)) / (2 * (velocity ** 2) * (np.cos(angle) ** 2))) + start_height
+    y = (np.tan(angle) * x) + ((acceleration * (x ** 2)) / ((2 * (velocity ** 2) * (np.cos(angle) ** 2)) + start_height))
     return y
 
 
@@ -446,7 +446,7 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
         svt = inp_svt
         for i in range(3):
             if svt_mask[i] == 1:
-                svt = int(inp_svt)
+                svt[i] = int(inp_svt[i])
             if i == index:
                 svt[i] = 0
             elif svt[i] == '':
@@ -630,8 +630,66 @@ def tests():
 tests()
 
 
-def verify_velangle(velocity, angle, acceleration, height, x, y):
-    pass
+def verify_velangle(values, check_variable, check_value):
+    input_mask = []
+    for i in range(6):
+        if values[i] != '':
+            input_mask.append(1)
+        else:
+            input_mask.append(0)
+
+    x, y, vel, angle, accel, h = values
+    if check_variable == 'angle':
+        found_angle = find_theta(x, y, vel, accel, h)
+        if len(found_angle) == 1 and len(check_value) == 1:
+            if found_angle == check_value:
+                return True, found_angle
+            else:
+                return False, found_angle
+        elif len(found_angle) == 2 and len(check_value) == 2:
+            if found_angle[0] == check_value[0] and found_angle[1] == check_value[1]:
+                return True, found_angle[0], found_angle[1]
+            elif found_angle[0] == check_value[1] and found_angle[1] == check_value[0]:
+                return True, found_angle[1], found_angle[0]
+            else:
+                return False, found_angle[0], found_angle[1]
+
+    elif check_variable == 'y':
+        found_y = vel_angle_eqn(x, vel, angle, accel, h)
+        if found_y == check_value:
+            return True, found_y
+        else:
+            return False, found_y
+
+    elif check_variable == 'x':
+        angle = angle * np.pi / 180
+        alpha = accel/(2*(vel**2)*(np.cos(angle)**2))
+        beta = np.tan(angle)
+        gamma = -y + h
+        found_x = np.roots([alpha, beta, gamma])
+        # check length of found x
+        if found_x[0] == check_value[0] and found_x[1] == check_value[1]:
+            return True, found_x[0], found_x[1]
+        elif found_x[1] == check_value[0] and found_x[0] == check_value[1]:
+            return True, found_x[0], found_x[1]
+        else:
+            return False, found_x[0], found_x[1]
+
+    elif check_variable == 'accel':
+        angle = angle * np.pi / 180
+        found_a = (2 * vel**2 * np.cos(angle)**2 * (y - h - (x*np.tan(angle)))) / x**2
+        if found_a == check_value:
+            return True, found_a
+        else:
+            return False, found_a
+
+    elif check_variable == 'vel':
+        angle = angle * np.pi / 180
+        found_vel = np.sqrt((accel * x**2) / 2 * (np.cos(angle))**2 * (y - (x*np.tan(angle))))
+        if found_vel == check_value:
+            return True, found_vel
+        else:
+            return False, found_vel
 
 
 # create a function to store the values from a simulation into sql

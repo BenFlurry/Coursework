@@ -1,3 +1,5 @@
+import random
+import string
 """
 3 variable suvat
 2 variable svt
@@ -13,6 +15,32 @@ x2(a/2v2) + x(u/v) - y+h = 0     finds x
 v2(y-h) -v(ux)) - 0.5xa = 0     finds v
 
 case where t can be found from svt and then used in suvat or vice versa
+
+
+y, x, angle, accel, vel, height
+y = x, angle, accel, height, vel
+y = y
+u = vel(sin(angle))
+v 
+a = accel
+t
+
+x = x
+v = vel(cos(angle))
+t
+
+y = xtan + (ax^2)/2v^2 cos^2     finds y
+x^2(a/2u^2cos^2) + x(tan) -y+h   finds x
+a = (2v^2cos^2(y-h-xtan))/x^2    finds a 
+v = sqrt(ax^2 / 2(y - xtan)cos^2 finds v
+
+
 """
-x = 3,
-print(type(x))
+import numpy as np
+found = np.roots([1, -2, 1])
+print(found)
+print(type(found))
+print(found[0])
+print(len(found))
+
+print(-np.sqrt(9))
