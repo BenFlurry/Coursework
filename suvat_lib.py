@@ -279,22 +279,78 @@ def how_many_suvat_variables(s, u, v, a, t):
     return 5 - none
 
 
+def find_variables(suvat, svt, h):
+    # get suvat svt masks
+    suvat_mask = []
+    svt_mask = []
+    svt_other = []
+    suvat[0] -= h
+    suvat_total = 0
+    for i in range(5):
+        if suvat[i] == '':
+            suvat_mask.append(0)
+            suvat[i] = None
+        else:
+            suvat_mask.append(1)
+            suvat_total += 1
+    for i in range(5):
+        if svt[i] == '':
+            svt_mask.append(0)
+            svt[i] = None
+        else:
+            svt_mask.append(1)
+
+    # find a
+    if suvat_mask[1] == 0:
+        # if t needs to be found, find it
+        if suvat_total == 2:
+            suvat[4] = svt_equation(*svt, 't')[0]
+
+        suvat[1] = choose_suvat_eqn(*suvat, 'u')[0]
+
+    # find u
+    if suvat_mask[3] == 0:
+        # find t if needed
+        if suvat_total == 2:
+            suvat[4] = svt_equation(*svt, 't')[0]
+
+        suvat[3] = choose_suvat_eqn(*suvat, 'a')[0]
+
+    # find v
+    if svt_mask[1] == 0:
+        if svt_mask[1] == [1, 0, 1]:
+            svt[1] = svt_equation(*svt, 'v')[0]
+
+        else:
+            svt[2] = max(choose_suvat_eqn(*suvat, 't'))
+            svt[1] = svt_equation(*svt, 'v')[0]
+            t = min(choose_suvat_eqn(*suvat, 't'))
+            # check the min value of t > 0, if so we can use it
+            if t > 0:
+                svt_other = svt
+                svt_other[2] = t
+                svt_other[1] = svt_equation(*svt, 'v')[0]
+
+    suvat[0] += h
+    return suvat, svt, svt_other, h
+
 def graph_main_suvat(values_suvat, values_svt, start_height):
-    # if uy and ay are unknown
-    if values_suvat[1] == '' or values_suvat[3] == '':
-        # find the unknown values needed to plot curve
-        values_suvat = find_sua(values_suvat, start_height)
-    # if vx is unknown
-    if values_svt[1] == '':
-        # find v
-        values_svt = find_v(values_svt)
-    # todo have values_svt return a tuple, then check the length of it to determine whether 1 or 2 lines to plot
+    suvat, svt, svt_other, h = find_variables(values_suvat, values_svt, start_height)
     # create list of coords
-    coords = para_hor_ver_arr(values_suvat, values_svt, start_height)
-    print(coords)
-    plt.plot(coords[0], coords[1])
-    plt.show()
-    return coords
+    if not svt_other:
+        coords = para_hor_ver_arr(suvat, svt, h)
+        print(coords)
+        plt.plot(coords[0], coords[1])
+        plt.show()
+        return coords
+    else:
+        coords1 = para_hor_ver_arr(suvat, svt, h)
+        coords2 = para_hor_ver_arr(suvat, svt_other, h)
+        print(coords1, coords2)
+        plt.plot(coords1[0], coords1[1])
+        plt.plot(coords2[0], coords2[1])
+        plt.show()
+        return coords1, coords2
 
 
 # equation to take in x, velocity angle, acceleration and start height and return the y value for each x passed in

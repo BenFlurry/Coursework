@@ -34,13 +34,9 @@ x^2(a/2u^2cos^2) + x(tan) -y+h   finds x
 a = (2v^2cos^2(y-h-xtan))/x^2    finds a 
 v = sqrt(ax^2 / 2(y - xtan)cos^2 finds v
 
-
+s 
+u
+v
+a
+t
 """
-import numpy as np
-found = np.roots([1, -2, 1])
-print(found)
-print(type(found))
-print(found[0])
-print(len(found))
-
-print(-np.sqrt(9))
