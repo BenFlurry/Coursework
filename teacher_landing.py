@@ -234,3 +234,4 @@ class TeacherLanding(QMainWindow, ui):
 
         if self.editing_class:
             self.class_editing()
+
