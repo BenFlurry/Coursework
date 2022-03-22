@@ -227,6 +227,7 @@ class TeacherLanding(QMainWindow, ui):
         # reload the table
         self.load_students()
 
+
     def save(self):
         if self.creating_class:
             self.class_creation()
