@@ -194,13 +194,13 @@ def para_hor_ver_arr(suvat, svt, start_height):
 
 
 # takes in given parameters and returns lists of x and y coords
-def para_vel_angle_arr(velocity, angle, acceleration):
+def para_vel_angle_arr(velocity, angle, acceleration, height):
     # calculate the hor, ver components of velocity using trigonometry
     vx = float(velocity * np.cos(angle / 180 * np.pi))
     ay = acceleration
     uy = float(velocity * np.sin(angle / 180 * np.pi))
     # call the create list function
-    return para_create_coords_lists(uy, ay, vx)
+    return para_create_coords_lists(uy, ay, vx, height)
 
 
 def find_variables(suvat, svt, h):
@@ -357,11 +357,10 @@ def style_graphs():
 
 # round values to 3sf
 def to_3sf(value):
-    return round(value,  - int(math.floor(math.log10(abs(value)))))
+    return round(value, 3 - int(math.floor(math.log10(abs(value)))))
 
 
-# todo  make the calculation of each case its own function to be able to be called elsewhere
-# input validate as a string for either 
+# input validate as a string for either
 def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
     variables = ['sy', 'uy', 'vy', 'ay', 'ty', 'sx', 'vx', 'tx', 'h']
     index = variables.index(check_variable)
@@ -506,7 +505,7 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
             if svt_mask == [1, 0, 0]:
                 actual_value = (to_3sf(svt_equation(e, f, t, 'v')[0]))
             else:
-                actual_value = (to_3sf(svt_equation(e, f, t, 's')[0]))
+                actual_value = to_3sf(svt_equation(e, f, t, 's')[0])
             # and check if its correct
             if actual_value == check_value:
                 return True, actual_value
@@ -566,7 +565,7 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
         if svt_mask[1] == 1:
             alpha = y - h
             beta = -u * x
-            gamma = -0.5 * x * a
+            gamma = -0.5 * x**2 * a
             # find roots
             roots = np.roots([alpha, beta, gamma])
             if roots[0] == check_value[0] and roots[1] == check_value[1] and type(check_value) == tuple:
