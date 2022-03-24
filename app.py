@@ -9,6 +9,7 @@ from velanglecalculator import CalculateVelAngleWindow
 from login_screen import LoginScreen
 from signin_screen import SigninScreen
 from create_account_screen import CreateAccountScreen
+from create_question import CreateQuestion
 
 
 class App(QMainWindow):
@@ -21,8 +22,9 @@ class App(QMainWindow):
 
         # load the login screen
         # self.setup_teacher_landing()
-        self.setup_suvat_svt_entry()
+        # self.setup_suvat_svt_entry()
         # self.setup_login_screen()
+        self.setup_create_question_screen()
         self.show()
 
     def popup_status(self, button_name):
@@ -103,5 +105,12 @@ class App(QMainWindow):
         self.open_screens.append(self.suvat_window)
         # add button handlers
         self.suvat_window.to_velangle.clicked.connect(self.setup_vel_angle_entry)
+
+    def setup_create_question_screen(self):
+        self.current_screen = 'create question'
+        self.create_question = CreateQuestion(self)
+        self.close_screens()
+        self.open_screens.append(self.create_question)
+
 
 

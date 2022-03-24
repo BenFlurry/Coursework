@@ -42,8 +42,3 @@ a
 t
 """
 
-def to_3sf(value):
-    return round(value, 2 - int(math.floor(math.log10(abs(value)))))
-
-x = 0.001234
-print(to_3sf(x))
