@@ -42,3 +42,5 @@ a
 t
 """
 
+my_dict = {'a':1, 'b':2}
+print(list(my_dict.keys()))

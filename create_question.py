@@ -27,11 +27,24 @@ class CreateQuestion(QMainWindow, ui):
         self.c = self.conn.cursor()
         # button handlers
         self.check_valid_question.clicked.connect(self.check_valid)
+        self.add_question.clicked.connect(self.save_question_clicked)
         # initialise popout box
         self.box = QMessageBox()
         self.box.setIcon(QMessageBox.Critical)
         self.box.buttonClicked.connect(self.handle_box)
 
+        self.variable_dict = {'Vertical Displacement': 'sy',
+                              'Vertical Initial Velocity': 'uy',
+                              'Vertical Final Velocity': 'vy',
+                              'Vertical Acceleration': 'ay',
+                              'Time': 't',
+                              'Horizontal Displacement': 'sx',
+                              'Horizontal Velocity': 'vx',
+                              'Choose Target Variable': 'none'}
+
+        self.variable_list = list(self.variable_dict.values())
+        self.status = 'checking'
+        self.add_question.setHidden(True)
 
     def check_valid(self):
         suvat = [self.inp_sy.text(),
@@ -46,16 +59,7 @@ class CreateQuestion(QMainWindow, ui):
 
         h = self.inp_height.text()
 
-        variable_dict = {'Vertical Displacement': 'sy',
-                         'Vertical Initial Velocity': 'uy',
-                         'Vertical Final Velocity': 'vy',
-                         'Vertical Acceleration': 'ay',
-                         'Time': 't',
-                         'Horizontal Displacement': 'sx',
-                         'Horizontal Velocity': 'vx',
-                         'Choose Target Variable': 'none'}
-
-        check_variable = variable_dict[self.inp_check_variable.currentText()]
+        check_variable = self.variable_dict[self.inp_check_variable.currentText()]
 
         message = ''
         valid_input = True
@@ -75,9 +79,8 @@ class CreateQuestion(QMainWindow, ui):
                     svt[2] = suvat[4]
                 # find the check value
 
-                variable_list = list(variable_dict.values())
-                variable_list.remove('none')
-                index = variable_list.index(check_variable)
+                self.variable_list.remove('none')
+                index = self.variable_list.index(check_variable)
                 if index <= 4:
                     check_value = float(suvat[index])
                 elif 5 <= index <= 7:
@@ -105,6 +108,8 @@ class CreateQuestion(QMainWindow, ui):
             message = 'Choose a target variable'
             valid_input = False
 
+        self.valid_question = False
+
         if valid_input:
             verified = verify_suvat(suvat, svt, h, check_variable, check_value)
         # if input is incorrect
@@ -127,9 +132,9 @@ class CreateQuestion(QMainWindow, ui):
         elif verified[0] is False:
             self.box.setIcon(QMessageBox.Question)
             self.box.setWindowTitle('Invalid Answer')
-            # todo make it so different lengths can still have both values shown
-            self.box.setText(f'Change {verified[1][len(verified[1]) - 1]} to answer value?')
-            self.box.setInformativeText(f'The answer you entered ({check_value}) does not equal the calculated answer {verified[1][len(verified[1]) - 1]}')
+            self.box.setText(f'Change {verified[1][0] if len(verified[1]) == 1 else verified[1]} to answer value?')
+            self.box.setInformativeText(
+                f'The answer you entered ({check_value}) does not equal the calculated answer {verified[1][0] if len(verified[1]) == 1 else verified[1]}')
             self.box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             self.box.setDefaultButton(QMessageBox.Yes)
 
@@ -138,27 +143,61 @@ class CreateQuestion(QMainWindow, ui):
             self.box.setIcon(QMessageBox.Information)
             self.box.setWindowTitle('Valid')
             self.box.setText('Valid Question')
-            self.box.setStandardButtons(QMessageBox.Ok)
-            self.box.setDefaultButton(QMessageBox.Ok)
+            self.box.setStandardButtons(QMessageBox.Yes)
+            self.box.setDefaultButton(QMessageBox.Yes)
+            self.add_question.setHidden(False)
+
+        self.check_var = check_variable
+        self.check_val = check_value
+        self.suvat_values = suvat
+        self.svt_values = svt
+        self.h_val = h
+        self.calculated_val = verified
 
         self.box.exec()
-
-        self.check_variable = check_variable
-        self.check_value = check_value
-        self.suvat = suvat
-        self.svt = svt
-        self.h = h
-        self.verified = verified
 
     # todo make check var/val global, if yes, change them to calculated
     def handle_box(self, button_name):
         button_name = button_name.text()
-        print(button_name)
-        if button_name == '&Yes':
-            pass
+        # if the user wants to change the value of the answer to the calculated answer
+        if button_name == '&Yes' and self.status == 'checking':
+            # set question satus to valid
+            # change check_value to the calculated one
+            # if len(self.calculated_val[1] == 2):
+            #     self.check_value = self.calculated_val[1]
+            # else:
+            #     self.check_value = self.calculated_val[1][0]
+
+            self.add_question.setHidden(False)
+
+    def save_question_clicked(self):
+        self.box.setIcon(QMessageBox.Question)
+        self.box.setText('Are you sure you add the question:')
+        list_of_vars = self.suvat_values + self.svt_values + [self.h_val]
+        # remove duplicate time value
+        list_of_vars.pop(4)
+        # begin to make output string
+        output_string = ''
+        var_dict = self.variable_dict
+        # add height to list / dict
+        del var_dict['Choose Target Variable']
+        var_dict['Start Height'] = 'h'
+        var_list = self.variable_list + ['h']
+        for i in range(len(list_of_vars)):
+            # varible find the key using the value for the variable name
+            var_name = list(var_dict.keys())[list(var_dict.values()).index(var_list[i])]
+            # construct output string
+            output_string += f'{var_name} = {list_of_vars[i]} \n'
+        print(output_string)
 
     def save_question(self):
-        pass
-
-
+        # get rid of check_variable's value
+        index = self.variable_list.index(self.check_variable)
+        if index <= 3:
+            self.suvat_values[index] = ''
+        elif index == 4:
+            self.suvat_values[index] = ''
+            self.svt_values[index - 5] = ''
+        else:
+            self.svt_values[index - 5] = ''
 
