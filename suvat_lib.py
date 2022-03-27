@@ -582,7 +582,7 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
                 return False, (roots[0], roots[1])
 
     else:
-        return 'Invalid',
+        return 'invalid',
 
 
 def tests():

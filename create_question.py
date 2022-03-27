@@ -47,6 +47,7 @@ class CreateQuestion(QMainWindow, ui):
         self.add_question.setHidden(True)
 
     def check_valid(self):
+        self.status = 'checking'
         suvat = [self.inp_sy.text(),
                  self.inp_uy.text(),
                  self.inp_vy.text(),
@@ -59,12 +60,12 @@ class CreateQuestion(QMainWindow, ui):
 
         h = self.inp_height.text()
 
-        check_variable = self.variable_dict[self.inp_check_variable.currentText()]
-
         message = ''
         valid_input = True
         # todo copy this into the suvat sim screen
-        if check_variable != 'none':
+        if self.inp_check_variable.currentText() != 'Choose Target Variable':
+            # set the check variable
+            check_variable = self.variable_dict[self.inp_check_variable.currentText()]
             # if 2 values of t entered, they must be equal
             if suvat[4] == '' or svt[2] == '' or (suvat[4] == svt[2] and suvat[4] != '' and svt[2] != ''):
                 # change t to int
@@ -79,12 +80,20 @@ class CreateQuestion(QMainWindow, ui):
                     svt[2] = suvat[4]
                 # find the check value
 
-                self.variable_list.remove('none')
+
                 index = self.variable_list.index(check_variable)
                 if index <= 4:
-                    check_value = float(suvat[index])
+                    if suvat[index] == '':
+                        message = 'enter a value for the target variable'
+                        valid_input = False
+                    else:
+                        check_value = float(suvat[index])
                 elif 5 <= index <= 7:
-                    check_value = float(svt[index - 5])
+                    if suvat[index] == '':
+                        message = 'enter a value for the target variable'
+                        valid_input = False
+                    else:
+                        check_value = float(svt[index - 5])
 
                 # check t > 0
                 if type(suvat[4]) != float or (suvat[4] > 0 and svt[2] > 0):
@@ -112,6 +121,10 @@ class CreateQuestion(QMainWindow, ui):
 
         if valid_input:
             verified = verify_suvat(suvat, svt, h, check_variable, check_value)
+            if verified[0] == 'invalid':
+                valid_input = False
+                message = 'could not calculate target variable with given inputs'
+
         # if input is incorrect
         if valid_input is False:
             self.box.setIcon(QMessageBox.Critical)
@@ -119,6 +132,7 @@ class CreateQuestion(QMainWindow, ui):
             self.box.setText(message)
             self.box.setStandardButtons(QMessageBox.Ok)
             self.box.setDefaultButton(QMessageBox.Ok)
+            self.add_question.setHidden(True)
 
         # if it is not solveable
         elif verified[0] == 'Invalid':
@@ -127,16 +141,23 @@ class CreateQuestion(QMainWindow, ui):
             self.box.setText('Not enough information given')
             self.box.setStandardButtons(QMessageBox.Ok)
             self.box.setDefaultButton(QMessageBox.Ok)
+            self.add_question.setHidden(True)
 
         # if valid, but the question may be wrong
         elif verified[0] is False:
             self.box.setIcon(QMessageBox.Question)
             self.box.setWindowTitle('Invalid Answer')
-            self.box.setText(f'Change {verified[1][0] if len(verified[1]) == 1 else verified[1]} to answer value?')
+            self.box.setText(f'Change "{verified[1][0] if len(verified[1]) == 1 else verified[1]}" to answer value?')
             self.box.setInformativeText(
-                f'The answer you entered ({check_value}) does not equal the calculated answer {verified[1][0] if len(verified[1]) == 1 else verified[1]}')
+                f'The answer you entered "{check_value}" does not equal the calculated answer "{verified[1][0] if len(verified[1]) == 1 else verified[1]}"')
             self.box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             self.box.setDefaultButton(QMessageBox.Yes)
+            self.check_var = check_variable
+            self.check_val = check_value
+            self.suvat_values = suvat
+            self.svt_values = svt
+            self.h_val = h
+            self.calculated_val = verified
 
         # output success
         else:
@@ -146,17 +167,15 @@ class CreateQuestion(QMainWindow, ui):
             self.box.setStandardButtons(QMessageBox.Yes)
             self.box.setDefaultButton(QMessageBox.Yes)
             self.add_question.setHidden(False)
-
-        self.check_var = check_variable
-        self.check_val = check_value
-        self.suvat_values = suvat
-        self.svt_values = svt
-        self.h_val = h
-        self.calculated_val = verified
+            self.check_var = check_variable
+            self.check_val = check_value
+            self.suvat_values = suvat
+            self.svt_values = svt
+            self.h_val = h
+            self.calculated_val = verified
 
         self.box.exec()
 
-    # todo make check var/val global, if yes, change them to calculated
     def handle_box(self, button_name):
         button_name = button_name.text()
         # if the user wants to change the value of the answer to the calculated answer
@@ -169,8 +188,33 @@ class CreateQuestion(QMainWindow, ui):
             #     self.check_value = self.calculated_val[1][0]
 
             self.add_question.setHidden(False)
+            # todo change check value and value shown in the ui
+
+        elif button_name == '&No' and self.status == 'checking':
+            self.add_question.setHidden(True)
+
+        elif button_name == "&Yes" and self.status == 'saving':
+            # todo remove check value from variables list and run method to save to db
+            self.save_question()
 
     def save_question_clicked(self):
+        # todo check that nothing had been edited since check had been done
+        suvat = [self.inp_sy.text(),
+                 self.inp_uy.text(),
+                 self.inp_vy.text(),
+                 self.inp_ay.text(),
+                 self.inp_ty.text()]
+
+        svt = [self.inp_sx.text(),
+               self.inp_vx.text(),
+               self.inp_tx.text()]
+
+        h = self.inp_height.text()
+        # todo change float type to string type to compare lists
+        print(f'{suvat = }, {svt = }, {h = }')
+        print(f'{self.suvat_values = }. {self.svt_values = }, {self.h_val}')
+
+        self.status = 'saving'
         self.box.setIcon(QMessageBox.Question)
         self.box.setText('Are you sure you add the question:')
         list_of_vars = self.suvat_values + self.svt_values + [self.h_val]
@@ -182,13 +226,22 @@ class CreateQuestion(QMainWindow, ui):
         # add height to list / dict
         del var_dict['Choose Target Variable']
         var_dict['Start Height'] = 'h'
+        var_list = self.variable_list
+        var_list.remove('none')
         var_list = self.variable_list + ['h']
         for i in range(len(list_of_vars)):
             # varible find the key using the value for the variable name
             var_name = list(var_dict.keys())[list(var_dict.values()).index(var_list[i])]
             # construct output string
             output_string += f'{var_name} = {list_of_vars[i]} \n'
-        print(output_string)
+
+        var_name = list(var_dict.keys())[list(var_dict.values()).index(self.check_var)]
+
+        output_string += f'answer variable = {var_name}\nanswer value = {self.check_val}'
+        self.box.setInformativeText(output_string)
+        self.box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        self.box.setDefaultButton(QMessageBox.Yes)
+        self.box.exec()
 
     def save_question(self):
         # get rid of check_variable's value
@@ -201,3 +254,6 @@ class CreateQuestion(QMainWindow, ui):
         else:
             self.svt_values[index - 5] = ''
 
+
+
+    # todo also make a back button that goes back to hw screen
