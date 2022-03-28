@@ -41,3 +41,11 @@ v
 a
 t
 """
+f = [1, 'a', 3]
+try:
+    for i in range(3):
+        f[i] = float(f[i])
+except ValueError:
+    print('value error')
+
+print(f)

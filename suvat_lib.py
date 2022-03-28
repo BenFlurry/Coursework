@@ -18,6 +18,8 @@ def suat(s, u, a, t, to_be_found):
     else:
         return found,
 
+    # todo handle NaN
+
 # 2: s = vt - 0.5at^2
 def svat(s, v, a, t, to_be_found):
     if to_be_found == 's':
