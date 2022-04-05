@@ -64,7 +64,6 @@ class TeacherLanding(QMainWindow, ui):
         self.data = Data()
         self.data.test()
 
-
     def to_login(self):
         self.box.setIcon(QMessageBox.Question)
         self.box.setWindowTitle('LogOut?')

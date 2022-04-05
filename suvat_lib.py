@@ -210,7 +210,8 @@ def find_variables(suvat, svt, h):
     suvat_mask = []
     svt_mask = []
     svt_other = []
-    suvat[0] -= h
+    if suvat[0]:
+        suvat[0] -= h
     suvat_total = 0
     for i in range(5):
         if suvat[i] == '':
@@ -219,21 +220,18 @@ def find_variables(suvat, svt, h):
         else:
             suvat_mask.append(1)
             suvat_total += 1
-    for i in range(5):
+    for i in range(3):
         if svt[i] == '':
             svt_mask.append(0)
             svt[i] = None
         else:
             svt_mask.append(1)
-
     # find a
     if suvat_mask[1] == 0:
         # if t needs to be found, find it
         if suvat_total == 2:
             suvat[4] = svt_equation(*svt, 't')[0]
-
         suvat[1] = choose_suvat_eqn(*suvat, 'u')[0]
-
     # find u
     if suvat_mask[3] == 0:
         # find t if needed
@@ -241,12 +239,10 @@ def find_variables(suvat, svt, h):
             suvat[4] = svt_equation(*svt, 't')[0]
 
         suvat[3] = choose_suvat_eqn(*suvat, 'a')[0]
-
     # find v
     if svt_mask[1] == 0:
         if svt_mask[1] == [1, 0, 1]:
             svt[1] = svt_equation(*svt, 'v')[0]
-
         else:
             svt[2] = max(choose_suvat_eqn(*suvat, 't'))
             svt[1] = svt_equation(*svt, 'v')[0]
@@ -256,23 +252,22 @@ def find_variables(suvat, svt, h):
                 svt_other = svt
                 svt_other[2] = t
                 svt_other[1] = svt_equation(*svt, 'v')[0]
-
-    suvat[0] += h
+    if suvat[0]:
+        suvat[0] += h
     return suvat, svt, svt_other, h
+
 
 def graph_main_suvat(values_suvat, values_svt, start_height):
     suvat, svt, svt_other, h = find_variables(values_suvat, values_svt, start_height)
     # create list of coords
     if not svt_other:
         coords = para_hor_ver_arr(suvat, svt, h)
-        print(coords)
         plt.plot(coords[0], coords[1])
         plt.show()
         return coords
     else:
         coords1 = para_hor_ver_arr(suvat, svt, h)
         coords2 = para_hor_ver_arr(suvat, svt_other, h)
-        print(coords1, coords2)
         plt.plot(coords1[0], coords1[1])
         plt.plot(coords2[0], coords2[1])
         plt.show()
@@ -406,7 +401,7 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
         if has_height:
             suvat[0] += height
 
-        if check_variable == 't':
+        if check_variable == 't' and suvat_mask == [1, 1, 0, 1, 0] or suvat_mask == [1, 0, 1, 1, 0]:
             calculated_t1 = to_3sf(choose_suvat_eqn(*suvat, check_variable[0])[0])
             calculated_t2 = to_3sf(choose_suvat_eqn(*suvat, check_variable[0])[1])
             if calculated_t1 > 0 and calculated_t2 > 0:
