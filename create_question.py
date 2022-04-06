@@ -257,7 +257,6 @@ class CreateQuestion(QMainWindow, ui):
         if button_name == '&Yes' and self.status == 'checking' or self.calculated_val[0] is True:
             # set question satus to valid
             # change check_value to the calculated one
-            print('here')
             self.add_question.setHidden(False)
             self.update_ui_values()
             # todo run code to ask if thats the question they want here
@@ -314,6 +313,7 @@ class CreateQuestion(QMainWindow, ui):
                 inp_svt[index - 5].setText(str(self.calculated_val[1][0]))
             else:
                 inp_svt[index - 5].setText(str(self.calculated_val[1][0]) + ', ' + str(self.calculated_val[1][1]))
+
 
     # check values havent changed and ask if they wish to save
     def save_question_clicked(self):
@@ -379,9 +379,8 @@ class CreateQuestion(QMainWindow, ui):
                     svt[i] = tuple(svt[i])
                 elif svt[i] != '':
                     svt[i] = float(svt[i])
-
-                if self.suvat_values[i] is None:
-                    self.suvat_values[i] = ''
+                if self.svt_values[i] is None:
+                    self.svt_values[i] = ''
                 if svt[i] != self.svt_values[i]:
                     invalid = True
 
@@ -393,7 +392,7 @@ class CreateQuestion(QMainWindow, ui):
             invalid = True
             print('value error')
 
-        print(f'{self.suvat_values}, {self.svt_values}')
+        print(f'{self.suvat_values = }, {self.svt_values = }')
         print(f'{suvat = }, {svt = }')
 
         # if inputs havent changed
@@ -451,11 +450,44 @@ class CreateQuestion(QMainWindow, ui):
             self.svt_values[index - 5] = ''
 
     def graph_on(self):
+
         if self.h_val == '':
             h = 0
         else:
             h = self.h_val
-        graph_main_suvat(self.suvat_values, self.svt_values, h)
+
+        index = self.variable_list.index(self.check_var)
+        if index <= 3:
+            self.suvat_values[index] = ''
+        elif index == 4:
+            self.suvat_values[index] = ''
+            self.svt_values[index - 5] = ''
+        else:
+            self.svt_values[index - 5] = ''
+
+
+        suvat = self.suvat_values
+        svt = self.svt_values
+        for i in range(5):
+            if suvat[i] is None:
+                suvat[i] = ''
+
+        for i in range(3):
+            if svt[i] is None:
+                svt[i] = ''
+
+        print(f' graphing {suvat = }, {svt = }')
+        try:
+            graph_main_suvat(suvat, svt, h)
+
+        except Exception:
+            self.box.setWindowTitle('Input Error')
+            self.box.setIcon(QMessageBox.Critical)
+            self.box.setText('Not enough information to plot the graph')
+            self.box.setStandardButtons(QMessageBox.Ok)
+            self.box.setInformativeText('')
+            self.box.setDefaultButton(QMessageBox.Ok)
+            self.box.exec()
 
 
     # todo also make a back button that goes back to hw screen
