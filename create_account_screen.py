@@ -35,20 +35,8 @@ class CreateAccountScreen(QMainWindow, ui):
         self.details = {}
         self.conn = sqlite3.connect('database2.db', isolation_level=None)
         self.c = self.conn.cursor()
-        # self.account_type = 'teacher'
-        # self.student = False
-        # self.teacher = False
-        # self.email = ''\\\\\\\\
-        # self.username = ''
-        # self.password1 = ''
-        # self.password2 = ''
-        # self.valid_email = False
-        # self.valid_password = False
         self.box = QMessageBox()
         self.box.setIcon(QMessageBox.Critical)
-
-    def load_signin(self):
-        pass
 
     # make sure that the account is valid
     def validate_account(self):

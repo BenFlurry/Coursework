@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit, QMessageBox
 from PyQt5 import uic
 from suvat_lib import *
 import sqlite3
+from data import Data
 
 ui = uic.loadUiType('create_question.ui')[0]
 
@@ -13,19 +14,20 @@ suvat_question -> radio button
 velangle_question -> radio button
 check_valid_quesiton -> push button
 add_question -> push button
+question_name -> line edit
 '''
 
 # todo need to handle tuples tuples and more tuples
 
 
-class CreateQuestion(QMainWindow, ui):
+class CreateSuvatFlashcard(QMainWindow, ui):
     def __init__(self, app_window):
         # load UI
         super().__init__()
         self.setupUi(app_window)
 
         # connect to SQL db
-        self.conn = sqlite3.connect('database2.db', isolation_level=None)
+        self.conn = sqlite3.connect('database3.db', isolation_level=None)
         self.c = self.conn.cursor()
         # button handlers
         self.check_valid_question.clicked.connect(self.check_valid)
@@ -35,6 +37,8 @@ class CreateQuestion(QMainWindow, ui):
         self.box = QMessageBox()
         self.box.setIcon(QMessageBox.Critical)
         self.box.buttonClicked.connect(self.handle_box)
+        self.graph_allowed = False
+        self.data = Data()
 
         self.variable_dict = {'Vertical Displacement': 'sy',
                               'Vertical Initial Velocity': 'uy',
@@ -48,7 +52,7 @@ class CreateQuestion(QMainWindow, ui):
         self.variable_list = list(self.variable_dict.values())
         self.status = 'checking'
         self.add_question.setHidden(True)
-        self.calculate_val = False,
+        self.calculated_val = False,
 
     def check_valid(self):
         self.status = 'checking'
@@ -249,12 +253,23 @@ class CreateQuestion(QMainWindow, ui):
             self.calculated_val = verified
             # print(f'initial function: {self.suvat_values = }, {self.svt_values = }')
 
+        if self.allow_graph.isChecked():
+            self.graph_allowed = True
+        else:
+            self.graph_allowed = False
+
         self.box.exec()
 
     def handle_box(self, button_name):
         button_name = button_name.text()
         # if the user wants to change the value of the answer to the calculated answer
-        if button_name == '&Yes' and self.status == 'checking' or self.calculated_val[0] is True:
+
+        if button_name == "&Yes" and self.status == 'saving':
+            # todo remove check value from variables list and run method to save to db
+            index = self.variable_list.index(self.check_var)
+            self.finalise()
+
+        elif button_name == '&Yes' and self.status == 'checking' or self.calculated_val[0] is True:
             # set question satus to valid
             # change check_value to the calculated one
             self.add_question.setHidden(False)
@@ -265,10 +280,6 @@ class CreateQuestion(QMainWindow, ui):
         elif button_name == '&No' and self.status == 'checking':
             self.add_question.setHidden(True)
 
-        elif button_name == "&Yes" and self.status == 'saving':
-            # todo remove check value from variables list and run method to save to db
-            index = self.variable_list.index(self.check_var)
-            self.finalise()
 
     # update values on the ui
     def update_ui_values(self):
@@ -313,7 +324,6 @@ class CreateQuestion(QMainWindow, ui):
                 inp_svt[index - 5].setText(str(self.calculated_val[1][0]))
             else:
                 inp_svt[index - 5].setText(str(self.calculated_val[1][0]) + ', ' + str(self.calculated_val[1][1]))
-
 
     # check values havent changed and ask if they wish to save
     def save_question_clicked(self):
@@ -365,13 +375,12 @@ class CreateQuestion(QMainWindow, ui):
 
             for i in range(5):
                 if type(suvat[i]) == list:
-                    print('were here')
                     suvat[i] = tuple(suvat[i])
                 elif suvat[i] != '':
                     suvat[i] = float(suvat[i])
-                if self.suvat_values[i] is None:
+                elif self.suvat_values[i] is None:
                     self.suvat_values[i] = ''
-                if suvat[i] != self.suvat_values[i]:
+                elif suvat[i] != self.suvat_values[i]:
                     invalid = True
 
             for i in range(3):
@@ -379,9 +388,9 @@ class CreateQuestion(QMainWindow, ui):
                     svt[i] = tuple(svt[i])
                 elif svt[i] != '':
                     svt[i] = float(svt[i])
-                if self.svt_values[i] is None:
+                elif self.svt_values[i] is None:
                     self.svt_values[i] = ''
-                if svt[i] != self.svt_values[i]:
+                elif svt[i] != self.svt_values[i]:
                     invalid = True
 
             if h != '':
@@ -392,11 +401,12 @@ class CreateQuestion(QMainWindow, ui):
             invalid = True
             print('value error')
 
-        print(f'{self.suvat_values = }, {self.svt_values = }')
-        print(f'{suvat = }, {svt = }')
+        # print(f'{self.suvat_values = }, {self.svt_values = }')
+        # print(f'{suvat = }, {svt = }')
 
         # if inputs havent changed
         if not invalid:
+            print('im here')
             self.status = 'saving'
             self.box.setIcon(QMessageBox.Question)
             self.box.setText('Are you sure you add the question:')
@@ -440,7 +450,8 @@ class CreateQuestion(QMainWindow, ui):
 
     def finalise(self):
         # get rid of check_variable's value
-        index = self.variable_list.index(self.check_variable)
+        print('nowhere')
+        index = self.variable_list.index(self.check_var)
         if index <= 3:
             self.suvat_values[index] = ''
         elif index == 4:
@@ -448,9 +459,59 @@ class CreateQuestion(QMainWindow, ui):
             self.svt_values[index - 5] = ''
         else:
             self.svt_values[index - 5] = ''
+        userid = self.data.get_userid()
+        flashcard_name = self.question_name.text()
+        values = self.suvat_values + self.svt_values + [self.h_val]
+        for i in range(len(values)):
+            if type(values[i]) == float:
+                values[i] = str(values[i])
+
+        # get rid of duplicate t value
+        values.pop(len(values) - 2)
+
+        # insert values into SQL
+        try:
+            if flashcard_name != '':
+                # insert into the flashcard table
+                insert = '''INSERT INTO flashcards VALUES (null, ?, ?)'''
+                self.c.execute(insert, (userid, flashcard_name))
+
+                # get the flashcard id
+                select = '''SELECT MAX(flashcardid) 
+                FROM flashcards 
+                WHERE userid = ? AND name = ?'''
+                self.c.execute(select, (userid, flashcard_name))
+                flashcard_id = self.c.fetchall()[0][0]
+
+                # so we can add the flashcard id, and the values to the suvat values table
+                insert = f'''INSERT INTO suvatcards
+                VALUES (null{', ?' * 13}) '''
+                # un-tuple the answer, so it can be added as 2 values in the table
+                if len(self.calculated_val[1]) == 1:
+                    answer = (str(self.calculated_val[1][0]), '')
+                else:
+                    answer = (str(self.calculated_val[1][0]),
+                              str(self.calculated_val[1][1]))
+
+                self.c.execute(insert, (flashcard_id,
+                                        *values,
+                                        int(self.graph_allowed),
+                                        self.check_var,
+                                        answer[0],
+                                        answer[1]))
+
+            else:
+                self.box.setWindowTitle('Invalid Entry')
+                self.box.setText('Enter a question name')
+                self.box.setInformativeText('')
+                self.box.setStandardButtons(QMessageBox.Ok)
+                self.box.setDefaultButton(QMessageBox.Ok)
+                self.box.exec()
+
+        except Exception as e:
+            print(f'exception: {e}')
 
     def graph_on(self):
-
         if self.h_val == '':
             h = 0
         else:
@@ -464,7 +525,6 @@ class CreateQuestion(QMainWindow, ui):
             self.svt_values[index - 5] = ''
         else:
             self.svt_values[index - 5] = ''
-
 
         suvat = self.suvat_values
         svt = self.svt_values
@@ -488,6 +548,5 @@ class CreateQuestion(QMainWindow, ui):
             self.box.setInformativeText('')
             self.box.setDefaultButton(QMessageBox.Ok)
             self.box.exec()
-
 
     # todo also make a back button that goes back to hw screen

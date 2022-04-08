@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QLineEdit
 from PyQt5 import uic
 from suvat_lib import *
+import sqlite3
 
 ui = uic.loadUiType('suvatcalculator.ui')[0]
 
@@ -12,6 +13,8 @@ class CalculateSuvatWindow(QMainWindow, ui):
         self.setupUi(app_window)
         # run calculate function when button clicked
         self.calculate_btn.clicked.connect(self.calculate_values)
+        self.conn = sqlite3.connect('database2.db', isolation_level=None)
+        self.c = self.conn.cursor()
 
     def pull_values(self):
         # pull values from PyQt

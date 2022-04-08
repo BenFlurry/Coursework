@@ -39,6 +39,7 @@ class TeacherLanding(QMainWindow, ui):
         self.save_changes.clicked.connect(self.save)
         self.view_class.clicked.connect(self.show_class)
         self.delete_class.clicked.connect(self.remove)
+        self.set_homework.clicked.connect(self.create_homework)
 
         self.label1.setHidden(True)
         self.input1.setHidden(True)
@@ -98,6 +99,7 @@ class TeacherLanding(QMainWindow, ui):
         self.delete_class.setHidden(False)
         # load the class list into pyqt table
         self.load_classes()
+
 
     def load_table(self, headings, rows):
         # clear the pyqt table

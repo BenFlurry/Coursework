@@ -45,5 +45,6 @@ v
 a
 t
 """
-x = (1,2)
-print(list(x))
+val = False
+print(int(val))
+

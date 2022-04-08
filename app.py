@@ -9,7 +9,8 @@ from velanglecalculator import CalculateVelAngleWindow
 from login_screen import LoginScreen
 from signin_screen import SigninScreen
 from create_account_screen import CreateAccountScreen
-from create_question import CreateQuestion
+from suvat_flashcard import CreateSuvatFlashcard
+from landing_page import LandingPage
 
 
 class App(QMainWindow):
@@ -24,7 +25,8 @@ class App(QMainWindow):
         # self.setup_teacher_landing()
         # self.setup_suvat_svt_entry()
         # self.setup_login_screen()
-        self.setup_create_question_screen()
+        self.setup_landing_page()
+        # self.setup_create_suvat_flashcard()
         self.show()
 
     def popup_status(self, button_name):
@@ -48,7 +50,6 @@ class App(QMainWindow):
             self.open_screens[i].close()
             self.open_screens.pop(i)
 
-    # todo might have to pass in the dimensions of the previous window so window size is maintained through windows
     # set up event handlers
     def setup_signin_screen(self):
         self.current_screen = 'signin'
@@ -95,6 +96,7 @@ class App(QMainWindow):
         self.close_screens()
         self.open_screens.append(self.velangle_window)
         # add button handlers
+        self.velangle_window.back.clicked.connect(self.setup_landing_page)
         self.velangle_window.to_suvat.clicked.connect(self.setup_suvat_svt_entry)
 
     def setup_suvat_svt_entry(self):
@@ -104,13 +106,24 @@ class App(QMainWindow):
         self.close_screens()
         self.open_screens.append(self.suvat_window)
         # add button handlers
+        self.suvat_window.back.clicked.connect(self.setup_landing_page)
         self.suvat_window.to_velangle.clicked.connect(self.setup_vel_angle_entry)
 
-    def setup_create_question_screen(self):
-        self.current_screen = 'create question'
-        self.create_question = CreateQuestion(self)
+    def setup_landing_page(self):
+        self.current_screen = 'landing'
+        self.landing_page = LandingPage(self)
         self.close_screens()
-        self.open_screens.append(self.create_question)
+        self.open_screens.append(self.landing_page)
+        self.landing_page.suvat_flashcard.clicked.connect(self.setup_create_suvat_flashcard)
+        self.landing_page.logout.clicked.connect(self.setup_login_screen)
+        self.landing_page.to_simulator.clicked.connect(self.setup_suvat_svt_entry)
+
+    def setup_create_suvat_flashcard(self):
+        self.current_screen = 'create suvat flashcard'
+        self.create_suvat_flashcard = CreateSuvatFlashcard(self)
+        self.close_screens()
+        self.open_screens.append(self.create_suvat_flashcard)
+        self.create_suvat_flashcard.back.clicked.connect(self.setup_landing_page)
 
 
 
