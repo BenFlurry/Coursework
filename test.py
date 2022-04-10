@@ -1,6 +1,7 @@
 import math
 import random
 import string
+import random
 """
 3 variable suvat
 2 variable svt
@@ -45,6 +46,6 @@ v
 a
 t
 """
-val = False
-print(int(val))
+code = ''.join([random.choice(string.ascii_uppercase) for i in range(4)])
+print(code)
 

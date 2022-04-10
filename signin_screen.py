@@ -4,6 +4,7 @@ from suvat_lib import *
 import sqlite3
 import hashlib
 from data import Data
+from data import data_dict
 ui = uic.loadUiType('signin_screen.ui')[0]
 
 
@@ -26,27 +27,32 @@ class SigninScreen(QMainWindow, ui):
 
         self.sign_in.clicked.connect(self.signin)
         self.show_password.clicked.connect(self.toggle_password)
-        self.conn = sqlite3.connect('database2.db', isolation_level=None)
+        self.conn = sqlite3.connect('database3.db', isolation_level=None)
         self.c = self.conn.cursor()
         self.valid = False
 
         self.box = QMessageBox()
         self.data = Data()
 
+
+        self.student.setHidden(True)
+        self.teacher.setHidden(True)
+        self.guest.setHidden(True)
+
     def signin(self):
-        if self.student.isChecked():
-            self.account_type = 'student'
-        elif self.teacher.isChecked():
-            self.account_type = 'teacher'
-        elif self.guest.isChecked():
-            self.account_type = 'guest'
-        else:
-            self.box.setWindowTitle('Error')
-            self.box.setText('Select an account type')
-            self.box.setIcon(QMessageBox.Critical)
-            self.box.setStandardButtons(QMessageBox.Ok)
-            self.box.setDefaultButton(QMessageBox.Ok)
-            self.box.exec()
+        # if self.student.isChecked():
+        #     self.account_type = 'student'
+        # elif self.teacher.isChecked():
+        #     self.account_type = 'teacher'
+        # elif self.guest.isChecked():
+        #     self.account_type = 'guest'
+        # else:
+        #     self.box.setWindowTitle('Error')
+        #     self.box.setText('Select an account type')
+        #     self.box.setIcon(QMessageBox.Critical)
+        #     self.box.setStandardButtons(QMessageBox.Ok)
+        #     self.box.setDefaultButton(QMessageBox.Ok)
+        #     self.box.exec()
 
             # popup saying select an account
         self.un = self.username.text()
@@ -67,48 +73,55 @@ class SigninScreen(QMainWindow, ui):
 
         if len(user) != 0:
             user = user[0]
-            # add the user id to the data class
-            self.data.set_userid(user[0])
+            # add the user id to the data dict
+            data_dict['userid'] = user[0]
+            data_dict['name'] = user[4]
+
             # to check the password, we need to first hash it
             self.pw = hashlib.sha256(self.pw.encode()).hexdigest()
             # check if the password is correct
 
             if self.pw == user[3]:
                 # check if the user is of the correct account type
+                msg = 'Valid account, continue to the program!'
+                self.box.setWindowTitle('Welcome!')
+                self.box.setIcon(QMessageBox.Information)
+                self.box.setStandardButtons(QMessageBox.Yes)
+                self.box.setDefaultButton(QMessageBox.Yes)
 
-                if self.account_type == 'teacher':
-                    # fetch the teacher id corresponding to the user id
-                    self.c.execute('SELECT teacherid FROM teachers WHERE userid = ?', (user[0],))
-                    teachers = self.c.fetchall()
-
-                    if len(teachers) == 1:
-                        self.data.set_teacherid(teachers[0][0])
-                        msg = 'Valid account, continue to the program!'
-                        self.box.setWindowTitle('Welcome!')
-                        self.box.setIcon(QMessageBox.Information)
-                        self.box.setStandardButtons(QMessageBox.Yes)
-                        self.box.setDefaultButton(QMessageBox.Yes)
-                    else:
-                        msg = 'A teacher does not exist with these credentials'
-                    # update the data class with the user id
-
-                elif self.account_type == 'student':
-                    # fetch the student id corresponding to the user id
-                    self.c.execute('SELECT studentid FROM students WHERE userid = ?', (user[0],))
-                    students = self.c.fetchall()
-                    # if the student id exists
-
-                    if len(students) == 1:
-                        # add the student id to the data class
-                        self.data.set_studentid(students[0][0])
-                        self.box.setWindowTitle('Welcome!')
-                        msg = 'Valid account, welcome to the program'
-                        self.box.setIcon(QMessageBox.Information)
-                    else:
-                        msg = 'A student does not exist with these credentials'
-
-                else:
-                    msg = 'The user does not exist for this account type'
+                # if self.account_type == 'teacher':
+                #     # fetch the teacher id corresponding to the user id
+                #     self.c.execute('SELECT teacherid FROM teachers WHERE userid = ?', (user[0],))
+                #     teachers = self.c.fetchall()
+                #
+                #     if len(teachers) == 1:
+                #         self.data.set_teacherid(teachers[0][0])
+                #         msg = 'Valid account, continue to the program!'
+                #         self.box.setWindowTitle('Welcome!')
+                #         self.box.setIcon(QMessageBox.Information)
+                #         self.box.setStandardButtons(QMessageBox.Yes)
+                #         self.box.setDefaultButton(QMessageBox.Yes)
+                #     else:
+                #         msg = 'A teacher does not exist with these credentials'
+                #     # update the data class with the user id
+                #
+                # elif self.account_type == 'student':
+                #     # fetch the student id corresponding to the user id
+                #     self.c.execute('SELECT studentid FROM students WHERE userid = ?', (user[0],))
+                #     students = self.c.fetchall()
+                #     # if the student id exists
+                #
+                #     if len(students) == 1:
+                #         # add the student id to the data class
+                #         self.data.set_studentid(students[0][0])
+                #         self.box.setWindowTitle('Welcome!')
+                #         msg = 'Valid account, welcome to the program'
+                #         self.box.setIcon(QMessageBox.Information)
+                #     else:
+                #         msg = 'A student does not exist with these credentials'
+                #
+                # else:
+                #     msg = 'The user does not exist'
 
             else:
                 self.password.setText('')
@@ -119,7 +132,6 @@ class SigninScreen(QMainWindow, ui):
 
         self.box.setText(msg)
         self.box.exec()
-
 
     def toggle_password(self):
         if self.show_password.isChecked():

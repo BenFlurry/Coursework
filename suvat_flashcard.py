@@ -3,6 +3,7 @@ from PyQt5 import uic
 from suvat_lib import *
 import sqlite3
 from data import Data
+from data import data_dict
 
 ui = uic.loadUiType('create_question.ui')[0]
 
@@ -39,6 +40,8 @@ class CreateSuvatFlashcard(QMainWindow, ui):
         self.box.buttonClicked.connect(self.handle_box)
         self.graph_allowed = False
         self.data = Data()
+
+
 
         self.variable_dict = {'Vertical Displacement': 'sy',
                               'Vertical Initial Velocity': 'uy',
@@ -265,21 +268,14 @@ class CreateSuvatFlashcard(QMainWindow, ui):
         # if the user wants to change the value of the answer to the calculated answer
 
         if button_name == "&Yes" and self.status == 'saving':
-            # todo remove check value from variables list and run method to save to db
-            index = self.variable_list.index(self.check_var)
             self.finalise()
 
         elif button_name == '&Yes' and self.status == 'checking' or self.calculated_val[0] is True:
-            # set question satus to valid
-            # change check_value to the calculated one
             self.add_question.setHidden(False)
             self.update_ui_values()
-            # todo run code to ask if thats the question they want here
-            # self.finalise()
 
         elif button_name == '&No' and self.status == 'checking':
             self.add_question.setHidden(True)
-
 
     # update values on the ui
     def update_ui_values(self):
@@ -459,7 +455,9 @@ class CreateSuvatFlashcard(QMainWindow, ui):
             self.svt_values[index - 5] = ''
         else:
             self.svt_values[index - 5] = ''
-        userid = self.data.get_userid()
+        # userid = self.data.get_userid()
+        userid = data_dict['userid']
+        print(f'{userid = }')
         flashcard_name = self.question_name.text()
         values = self.suvat_values + self.svt_values + [self.h_val]
         for i in range(len(values)):
@@ -473,14 +471,15 @@ class CreateSuvatFlashcard(QMainWindow, ui):
         try:
             if flashcard_name != '':
                 # insert into the flashcard table
-                insert = '''INSERT INTO flashcards VALUES (null, ?, ?)'''
-                self.c.execute(insert, (userid, flashcard_name))
+                insert = '''INSERT INTO flashcards VALUES (null, ?, ?, ?)'''
+                setid = data_dict['setid']
+                self.c.execute(insert, (flashcard_name, setid, 'suvat'))
 
                 # get the flashcard id
                 select = '''SELECT MAX(flashcardid) 
                 FROM flashcards 
-                WHERE userid = ? AND name = ?'''
-                self.c.execute(select, (userid, flashcard_name))
+                WHERE name = ?'''
+                self.c.execute(select, (flashcard_name,))
                 flashcard_id = self.c.fetchall()[0][0]
 
                 # so we can add the flashcard id, and the values to the suvat values table

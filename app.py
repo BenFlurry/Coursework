@@ -31,10 +31,9 @@ class App(QMainWindow):
 
     def popup_status(self, button_name):
         button_name = button_name.text()
-        print(button_name)
         if self.current_screen == 'signin':
             if button_name == '&Yes':
-                self.setup_teacher_landing()
+                self.setup_landing_page()
 
         elif self.current_screen == 'teacher landing':
             if button_name == '&Yes':

@@ -30,26 +30,29 @@ class CreateAccountScreen(QMainWindow, ui):
 
         # hook up the buttons
         self.create_account.clicked.connect(self.validate_account)
-        self.back.clicked.connect(self.load_signin)
+        # self.back.clicked.connect(self.load_signin)
         self.show_password.clicked.connect(self.toggle_password)
         self.details = {}
-        self.conn = sqlite3.connect('database2.db', isolation_level=None)
+        self.conn = sqlite3.connect('database3.db', isolation_level=None)
         self.c = self.conn.cursor()
         self.box = QMessageBox()
         self.box.setIcon(QMessageBox.Critical)
 
+        self.qstudent.setHidden(True)
+        self.qteacher.setHidden(True)
+
     # make sure that the account is valid
     def validate_account(self):
         # pull values from PyQt5
-        self.student = self.qstudent.isChecked()
-        self.teacher = self.qteacher.isChecked()
+        # self.student = self.qstudent.isChecked()
+        # self.teacher = self.qteacher.isChecked()
         self.email = self.qemail.text()
         self.username = self.qusername.text()
         self.password1 = self.qpassword1.text()
         self.password2 = self.qpassword2.text()
         self.name = self.qname.text()
-        self.account_type = ''
-        self.check_account_type()
+        # self.account_type = ''
+        # self.check_account_type()
         self.check_username()
         self.check_email()
         self.check_password()
@@ -145,15 +148,15 @@ class CreateAccountScreen(QMainWindow, ui):
             self.c.execute(query, self.details)
             print('new user account created')
             # fetch the userid from the created account
-            self.c.execute('SELECT userid FROM users WHERE username = ?', (self.details['username'],))
-            userid = self.c.fetchall()[0][0]
-            print(userid)
-            if self.account_type == 'teacher':
-                # and add to teachers table if a teacher
-                self.c.execute('INSERT INTO teachers VALUES(null, ?)', (userid,))
-            elif self.account_type == 'student':
-                # and add to students table if a student
-                self.c.execute('INSERT INTO students VALUES(null, ?, null)', (userid,))
+            # self.c.execute('SELECT userid FROM users WHERE username = ?', (self.details['username'],))
+            # userid = self.c.fetchall()[0][0]
+            # print(userid)
+            # if self.account_type == 'teacher':
+            #     # and add to teachers table if a teacher
+            #     self.c.execute('INSERT INTO teachers VALUES(null, ?)', (userid,))
+            # elif self.account_type == 'student':
+            #     # and add to students table if a student
+            #     self.c.execute('INSERT INTO students VALUES(null, ?, null)', (userid,))
             self.box.setWindowTitle('Error')
             self.box.setText('Continue to sign in')
             self.box.setIcon(QMessageBox.Information)

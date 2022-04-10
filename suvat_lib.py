@@ -690,25 +690,5 @@ def verify_velangle(values, check_variable, check_value):
             return False, found_vel
 
 
-# create a function to store the values from a simulation into sql
-def store_values():
-    data = Data()
-    userid = data.get_userid()
-
-
-# create a function to store a question with the values that have to be worked out
-def store_question():
-    pass
-
-
-# create a function to calculate the score for a student and save it to sql
-def calculate_score():
-    pass
-
-
-def store_score():
-    pass
-
-
 
 
