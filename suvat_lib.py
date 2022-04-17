@@ -492,10 +492,8 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
         else:
             return False, (actual_value,)
 
-    # todo not working
     # Case 4: suvat then svt
     elif num_of_suvat == 3 and num_of_svt == 1 and 5 <= index <= 6 and svt_mask[2] != 1:
-        print('case 4')
         suvat = inp_suvat
         # handle nones
         for i in range(4):
@@ -505,7 +503,6 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
                 suvat[i] = float(suvat[i])
         # find t from suvat
         t = choose_suvat_eqn(*suvat, 't')
-        print(f'{t = }')
         # if there are 2 valid values for t
         svt = inp_svt
         for i in range(3):

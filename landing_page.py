@@ -347,7 +347,6 @@ class LandingPage(QMainWindow, ui):
             self.add_set.setHidden(False)
             self.delete_button.setEnabled(False)
 
-    # todo have error message be hidden when a new button has been clicked
 
 
 
