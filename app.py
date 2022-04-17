@@ -11,6 +11,7 @@ from signin_screen import SigninScreen
 from create_account_screen import CreateAccountScreen
 from suvat_flashcard import CreateSuvatFlashcard
 from landing_page import LandingPage
+from practice_suvat_flashcards import PracticeSuvatFlashcards
 
 
 class App(QMainWindow):
@@ -24,9 +25,10 @@ class App(QMainWindow):
         # load the login screen
         # self.setup_teacher_landing()
         # self.setup_suvat_svt_entry()
-        # self.setup_login_screen()
-        self.setup_landing_page()
+        self.setup_login_screen()
+        # self.setup_landing_page()
         # self.setup_create_suvat_flashcard()
+        # self.setup_vel_angle_entry()
         self.show()
 
     def popup_status(self, button_name):
@@ -116,6 +118,7 @@ class App(QMainWindow):
         self.landing_page.suvat_flashcard.clicked.connect(self.setup_create_suvat_flashcard)
         self.landing_page.logout.clicked.connect(self.setup_login_screen)
         self.landing_page.to_simulator.clicked.connect(self.setup_suvat_svt_entry)
+        self.landing_page.practice_flashcards.clicked.connect(self.setup_practice_flashcards_screen)
 
     def setup_create_suvat_flashcard(self):
         self.current_screen = 'create suvat flashcard'
@@ -124,5 +127,10 @@ class App(QMainWindow):
         self.open_screens.append(self.create_suvat_flashcard)
         self.create_suvat_flashcard.back.clicked.connect(self.setup_landing_page)
 
-
+    def setup_practice_flashcards_screen(self):
+        self.current_screen = 'practice suvat flashcard'
+        self.practice_suvat_flashcard_screen = PracticeSuvatFlashcards(self)
+        self.close_screens()
+        self.open_screens.append(self.practice_suvat_flashcard_screen)
+        self.practice_suvat_flashcard_screen.to_landing.clicked.connect(self.setup_landing_page)
 

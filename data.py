@@ -25,9 +25,10 @@ class Data:
         return self.studentid
 
 
-data_dict = {'userid': -1,
+data_dict = {'userid': 2,
              'flashcardid': -1,
-             'setid': -1}
+             'setid': -1,
+             'setcode': 'zzzz'}
 
 
 

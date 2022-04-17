@@ -46,6 +46,6 @@ v
 a
 t
 """
-code = ''.join([random.choice(string.ascii_uppercase) for i in range(4)])
-print(code)
+inp = 'AAAA'
+print(inp.isupper())
 

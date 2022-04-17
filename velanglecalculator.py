@@ -33,10 +33,16 @@ class CalculateVelAngleWindow(QMainWindow, ui):
                 value_exists.append(0)
             else:
                 value_exists.append(1)
-                self.values[i] = int(self.values[i])
+                self.values[i] = float(self.values[i])
 
         # unpack the list
         vel, ang, acc, sh, x, y = self.values
+
+        if sh == '':
+            sh = 0
+            value_exists[3] = 1
+
+        print(self.values)
 
         # if there are the correct permutations of values, run the main velangle function
         if value_exists == [1, 0, 1, 1, 1, 1] or value_exists == [1, 1, 1, 1, 0, 0]:

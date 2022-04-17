@@ -161,10 +161,10 @@ def svt_main(values):
 
 def para_create_coords_lists(uy, ay, vx, start_height):
     # convert inputs to integers
-    uy = int(uy)
-    ay = int(ay)
-    vx = int(vx)
-    start_height = int(start_height)
+    uy = float(uy)
+    ay = float(ay)
+    vx = float(vx)
+    start_height = float(start_height)
     # create the x,y coords lists
     x_coords = []
     y_coords = []
@@ -207,82 +207,92 @@ def para_vel_angle_arr(velocity, angle, acceleration, height):
 
 
 def find_variables(suvat, svt, h):
-    # get suvat svt masks
-    suvat_mask = []
-    svt_mask = []
-    svt_other = []
-    # if suvat[0]:
-    #     suvat[0] -= h
-    suvat_total = 0
-    for i in range(5):
-        if suvat[i] == '':
-            suvat_mask.append(0)
-            suvat[i] = None
-        else:
-            suvat_mask.append(1)
-            suvat_total += 1
-    for i in range(3):
-        if svt[i] == '':
-            svt_mask.append(0)
-            svt[i] = None
-        else:
-            svt_mask.append(1)
-    # find a
-    if suvat_mask[1] == 0:
-        # if t needs to be found, find it
-        if suvat_total == 2:
-            suvat[4] = svt_equation(*svt, 't')[0]
-        suvat[1] = choose_suvat_eqn(*suvat, 'u')[0]
-    # find u
-    if suvat_mask[3] == 0:
-        # find t if needed
-        if suvat_total == 2:
-            suvat[4] = svt_equation(*svt, 't')[0]
+    try:
+        # get suvat svt masks
+        suvat_mask = []
+        svt_mask = []
+        svt_other = []
+        # if suvat[0]:
+        #     suvat[0] -= h
+        suvat_total = 0
+        for i in range(5):
+            if suvat[i] == '':
+                suvat_mask.append(0)
+                suvat[i] = None
+            else:
+                suvat[i] = float(suvat[i])
+                suvat_mask.append(1)
+                suvat_total += 1
+        for i in range(3):
+            if svt[i] == '':
+                svt_mask.append(0)
+                svt[i] = None
+            else:
+                svt[i] = float(svt[i])
+                svt_mask.append(1)
+        # find a
+        if suvat_mask[1] == 0:
+            # if t needs to be found, find it
+            if suvat_total == 2:
+                suvat[4] = svt_equation(*svt, 't')[0]
+            suvat[1] = choose_suvat_eqn(*suvat, 'u')[0]
+        # find u
+        if suvat_mask[3] == 0:
+            # find t if needed
+            if suvat_total == 2:
+                suvat[4] = svt_equation(*svt, 't')[0]
 
-        suvat[3] = choose_suvat_eqn(*suvat, 'a')[0]
-    # find v
-    if svt_mask[1] == 0:
-        if svt_mask[1] == [1, 0, 1]:
-            svt[1] = svt_equation(*svt, 'v')[0]
-        else:
-            time = choose_suvat_eqn(*suvat, 't')
-            t1 = max(time)
-            t2 = min(time)
-            print(f'{time = }')
-            svt[2] = t1
-            svt[1] = svt_equation(*svt, 'v')[0]
-            print(f'{svt = }')
-            # check the min value of t > 0, if so we can use it
-            if t2 > 0:
-                svt_other = []
-                for i in range(3):
-                    svt_other.append(svt[i])
-                svt_other[2] = t2
-                svt_other[1] = svt_equation(*svt_other, 'v')[0]
-                print(f'{svt_other[1] = }')
-                print(f'{svt_other = }')
+            suvat[3] = choose_suvat_eqn(*suvat, 'a')[0]
+        # find v
+        if svt_mask[1] == 0:
+            if svt_mask[1] == [1, 0, 1]:
+                svt[1] = svt_equation(*svt, 'v')[0]
+            else:
+                time = choose_suvat_eqn(*suvat, 't')
+                t1 = max(time)
+                t2 = min(time)
+                print(f'{time = }')
+                svt[2] = t1
+                svt[1] = svt_equation(*svt, 'v')[0]
+                print(f'{svt = }')
+                # check the min value of t > 0, if so we can use it
+                if t2 > 0:
+                    svt_other = []
+                    for i in range(3):
+                        svt_other.append(svt[i])
+                    svt_other[2] = t2
+                    svt_other[1] = svt_equation(*svt_other, 'v')[0]
+                    print(f'{svt_other[1] = }')
+                    print(f'{svt_other = }')
+
+        return suvat, svt, svt_other, h
     # if suvat[0]:
     #     suvat[0] += h
-    print(f'double check {svt = }, {svt_other = }')
-    return suvat, svt, svt_other, h
+    except Exception as e:
+        print(f'Error in finding variables for graph: {e}')
+        return False
 
 
 def graph_main_suvat(values_suvat, values_svt, start_height):
-    suvat, svt, svt_other, h = find_variables(values_suvat, values_svt, start_height)
+    variables = find_variables(values_suvat, values_svt, start_height)
+    print(f'{variables = }')
+    if not variables:
+        return 'not enough variables to plot graph'
+    else:
+        suvat, svt, svt_other, h = variables
     # create list of coords
     if not svt_other:
         coords = para_hor_ver_arr(suvat, svt, h)
         plt.plot(coords[0], coords[1])
         plt.show()
-        return coords
+        return True
     else:
-        print(f' in graphign: {svt = }, {svt_other = }')
         coords1 = para_hor_ver_arr(suvat, svt, h)
         coords2 = para_hor_ver_arr(suvat, svt_other, h)
         plt.plot(*coords1)
         plt.plot(*coords2)
         plt.show()
-        return coords1, coords2
+        return True
 
 
 # equation to take in x, velocity angle, acceleration and start height and return the y value for each x passed in
@@ -306,6 +316,9 @@ def vel_angle_x_intercept(velocity, angle, acceleration, start_height):
 
 # takes in vel, angle, acceleration, start height and plots the graph
 def graph_main_velangle(velocity, angle, acceleration, start_height, x, y):
+    if start_height == '':
+        start_height = 0
+
     if angle == '':
         angle = find_theta(x, y, velocity, acceleration, start_height)
         # convert angle from degrees to radians
@@ -410,7 +423,7 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
                 suvat[i] = None
 
         if has_height:
-            suvat[0] += height
+            suvat[0] += float(height)
 
         if check_variable == 't' and suvat_mask == [1, 1, 0, 1, 0] or suvat_mask == [1, 0, 1, 1, 0]:
             calculated_t1 = to_3sf(choose_suvat_eqn(*suvat, check_variable[0])[0])
@@ -479,6 +492,7 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
         else:
             return False, (actual_value,)
 
+    # todo not working
     # Case 4: suvat then svt
     elif num_of_suvat == 3 and num_of_svt == 1 and 5 <= index <= 6 and svt_mask[2] != 1:
         print('case 4')
@@ -491,6 +505,7 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
                 suvat[i] = float(suvat[i])
         # find t from suvat
         t = choose_suvat_eqn(*suvat, 't')
+        print(f'{t = }')
         # if there are 2 valid values for t
         svt = inp_svt
         for i in range(3):
@@ -499,7 +514,7 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
             else:
                 svt[i] = float(svt[i])
         e, f, _ = svt
-        if t[0] > 0 and t[1] > 0:
+        if len(t) == 2 and t[0] > 0 and t[1] > 0:
             # check which variable is missing and calculate the value
             if svt_mask == [1, 0, 0]:
                 actual_value = (to_3sf(svt_equation(e, f, t[0], 'v')[0]),
@@ -515,10 +530,13 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
         # if there is only 1 value of t
         else:
             # take the highest value
-            t = max(t[0], t[1])
+            if len(t) == 2:
+                t = max(t[0], t[1])
+            else:
+                t = t[0]
             # and calculate the missing variable
             if svt_mask == [1, 0, 0]:
-                actual_value = (to_3sf(svt_equation(e, f, t, 'v')[0]))
+                actual_value = to_3sf(svt_equation(e, f, t, 'v')[0])
             else:
                 actual_value = to_3sf(svt_equation(e, f, t, 's')[0])
             # and check if its correct
@@ -597,7 +615,7 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
 
 def tests():
     print('test 1: suvat only')
-    inputs = [3, 10, '', -10, ''], ['', '', ''], 0, 't', (1.63, 0.368)
+    inputs = ['3', '10', '', '-10', ''], ['', '', ''], '0', 't', ('1.63', '0.368')
     print(inputs)
     print(f'check value = {inputs[4]}')
     print('calculated value = ', end='')

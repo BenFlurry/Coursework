@@ -26,11 +26,11 @@ class LandingPage(QMainWindow, ui):
     def __init__(self, app_window):
         super().__init__()
         self.setupUi(app_window)
-        # name = data_dict['name']
-        # name = name.split()[0]
-        name = 'Ben'
-        # self.userid = data_dict['userid']
-        self.userid = 1
+        name = data_dict['name']
+        name = name.split()[0]
+        # name = 'Anshul'
+        self.userid = data_dict['userid']
+        # self.userid = 2
         self.welcome_label.setText(f'Welcome, {name}!')
         # connect to db
         self.conn = sqlite3.connect('database3.db', isolation_level=None)
@@ -44,12 +44,35 @@ class LandingPage(QMainWindow, ui):
         self.search.clicked.connect(self.search_clicked)
         self.delete_button.clicked.connect(self.delete_clicked)
         self.load_sets_button.clicked.connect(self.load_sets)
+        self.search_set_by_code.clicked.connect(self.search_set_by_code_clicked)
+        self.practice_flashcards.clicked.connect(self.practice_flashcards_clicked)
         # load the sets
         self.load_sets()
 
-        self.delete_type = 'invalid'
+        self.delete_type = 'sets'
 
         self.status = 'viewing sets'
+        self.handle_buttons()
+        self.error_message.setText('')
+
+        self.set_doesnt_exist = True
+
+
+    def practice_flashcards_clicked(self):
+        # pull values from table
+        rows = [index.row() for index in self.table.selectedIndexes()]
+        rows = list(dict.fromkeys(rows))
+        if len(rows) != 1:
+            self.error_message.setText('Select 1 set of flashcards to practice at a time')
+        else:
+            setcode = self.table.item(int(rows[0]), 0).text()
+            data_dict['setcode'] = setcode
+
+    def search_set_by_code_clicked(self):
+        if not self.set_doesnt_exist:
+            self.error_message.setText('')
+
+        self.status = 'entering code'
         self.handle_buttons()
 
     def delete_clicked(self):
@@ -65,14 +88,11 @@ class LandingPage(QMainWindow, ui):
                 self.c.execute('SELECT userid FROM sets WHERE setcode = ?', (setcode,))
                 # if the owner of the set is the current user of the program allow deletion
                 if data_dict['userid'] == self.c.fetchall()[0]['userid']:
-                    self.c.execute('DELETE FROM sets WHERE setname = ?', (setcode,))
+                    self.c.execute('DELETE FROM sets WHERE setcode = ?', (setcode,))
                 else:
                     self.error_message.setText("You can't edit a set that isn'y yours")
 
             # reload the table
-            select = 'SELECT setid FROM sets WHERE setname = ?'
-            self.c.execute(select, (setcode,))
-            self.setid = self.c.fetchall()[0][0]
             self.load_sets()
 
         elif self.delete_type == 'flashcards':
@@ -85,40 +105,59 @@ class LandingPage(QMainWindow, ui):
                 name = self.table.item(int(rows[i]), 0).text()
                 self.c.execute('SELECT flashcardid, setid FROM flashcards WHERE name = ?', (name,))
                 # check if the owner of the set is the one editing
-
-                id = self.c.fetchall()[0]['flashcardid']
-                setid = id['setid']
-                self.c.execute('SELECT userid FROM sets WHERE setid = ?', (setid,))
+                fetch = self.c.fetchall()[0]
+                id = fetch['flashcardid']
+                sid = fetch['setid']
+                self.c.execute('SELECT userid FROM sets WHERE setid = ?', (sid,))
                 if data_dict['userid'] == self.c.fetchall()[0]['userid']:
                     self.c.execute('DELETE FROM flashcards WHERE flashcardid = ?', (id,))
                 else:
                     self.error_message.setText('Cannot edit a set that isnt yours')
             # reload the table
             self.userid = data_dict['userid']
+            self.setid = sid
             self.load_flashcards()
 
     def search_clicked(self):
-        # todo hide buttons that arent relevant
+        self.error_message.setText('')
         self.delete_type = 'invalid'
-        if self.input_line.text():
+        inp = self.input_line.text()
+        valid = True
+        if len(inp) != 4 or not inp.isupper():
+            self.error_message.setText('Code has to be 4 uppercase letters')
+            valid = False
+
+        if inp and valid:
+            self.status = 'using code'
             select = '''SELECT setcode, setname, username, name
                             FROM sets
                             INNER JOIN users
                             ON users.userid = sets.userid
                             WHERE setcode = ?'''
-            self.c.execute(select, (self.input_line.text(),))
+            self.c.execute(select, (inp,))
             rows = self.c.fetchall()
-
-            # headings = ['Set Code', 'Set Name', 'Number Of Flashcards']
-            headings = ['Set Code', 'Set Name', 'Username', 'Name']
-            # load table
-            self.load_table(headings, rows)
-        else:
+            if len(rows) == 0:
+                self.set_doesnt_exist = True
+                self.error_message.setText("A set doesn't exist with this code")
+                self.search_set_by_code_clicked()
+            else:
+                # headings = ['Set Code', 'Set Name', 'Number Of Flashcards']
+                headings = ['Set Code', 'Set Name', 'Username', 'Name']
+                # load table
+                self.load_table(headings, rows)
+        elif not inp:
+            self.status = 'viewing sets'
             self.load_sets()
 
+        self.handle_buttons()
+        self.input_line.setText('')
+
+
     def create_new_set_clicked(self):
-        # todo hide buttons that arent relevant
-        pass
+        self.status = 'creating set'
+        self.error_message.setText('')
+
+        self.handle_buttons()
 
     def add_new_set(self):
         inp_set = self.input_line.text()
@@ -143,12 +182,17 @@ class LandingPage(QMainWindow, ui):
         self.load_table(headings, rows)
 
     def load_sets(self):
+        self.error_message.setText('')
+
         # select = '''SELECT sets.setcode, sets.setname, count(*)
         #         FROM sets
         #         INNER JOIN flashcards
         #         ON flashcards.setid = sets.setid
         #         WHERE sets.userid = ?
         #         GROUP BY sets.setid'''
+        self.status = 'viewing sets'
+        self.delete_type = 'sets'
+
         select = '''SELECT setcode, setname
                 FROM sets
                 WHERE userid = ?'''
@@ -159,6 +203,9 @@ class LandingPage(QMainWindow, ui):
         headings = ['Set Code', 'Set Name']
         # load table
         self.load_table(headings, rows)
+        self.handle_buttons()
+
+
 
     def load_table(self, headings, rows):
         # clear the pyqt table
@@ -182,13 +229,16 @@ class LandingPage(QMainWindow, ui):
 
     def edit_set_clicked(self):
         self.delete_type = 'flashcard'
+        self.error_message.setText('')
         rows = [index.row() for index in self.table.selectedIndexes()]
         # get rid of duplicate row indexes
         rows = list(dict.fromkeys(rows))
         if len(rows) != 1:
-            self.error_message.setText('Select 1 row to edit')
+            self.error_message.setText('Select 1 flashcard set to view')
+
         else:
             rows = self.table.item(rows[0], 0).text()
+            data_dict['setcode'] = rows
             print(f'{rows =}')
             try:
                 select = '''SELECT flashcards.name, sets.setname, flashcards.cardtype
@@ -205,10 +255,12 @@ class LandingPage(QMainWindow, ui):
                 self.c.execute('SELECT setid FROM sets WHERE setcode = ?', (rows,))
                 data_dict['setid'] = self.c.fetchall()[0]['setid']
                 print(f'{data_dict = }')
+                if self.status != 'using code':
+                    self.status = 'viewing flashcards'
 
             except sqlite3.IntegrityError:
                 self.error_message.setText('Issue with database')
-
+        self.handle_buttons()
 
     '''
     velangle_flashcard
@@ -248,7 +300,7 @@ class LandingPage(QMainWindow, ui):
             self.create_new_set.setEnabled(False)
             self.edit_set.setEnabled(False)
             self.search_set_by_code.setEnabled(False)
-            self.input_line.setHidden(False)
+            self.input_line.setHidden(True)
             self.search.setHidden(True)
             self.add_set.setHidden(True)
             self.delete_button.setEnabled(True)
@@ -265,7 +317,7 @@ class LandingPage(QMainWindow, ui):
             self.input_line.setHidden(False)
             self.search.setHidden(False)
             self.add_set.setHidden(True)
-            self.delete_button.setEnabled(True)
+            self.delete_button.setEnabled(False)
 
         # triggered when search button is clicked
         elif self.status == 'using code':
@@ -274,12 +326,12 @@ class LandingPage(QMainWindow, ui):
             self.practice_flashcards.setEnabled(True)
             self.load_sets_button.setEnabled(True)
             self.create_new_set.setEnabled(False)
-            self.edit_set.setEnabled(False)
+            self.edit_set.setEnabled(True)
             self.search_set_by_code.setEnabled(True)
             self.input_line.setHidden(False)
             self.search.setHidden(False)
             self.add_set.setHidden(True)
-            self.delete_button.setEnabled(True)
+            self.delete_button.setEnabled(False)
 
         # triggered when create new set is clicked
         elif self.status == 'creating set':
@@ -295,6 +347,7 @@ class LandingPage(QMainWindow, ui):
             self.add_set.setHidden(False)
             self.delete_button.setEnabled(False)
 
+    # todo have error message be hidden when a new button has been clicked
 
 
 

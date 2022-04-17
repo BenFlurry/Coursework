@@ -536,10 +536,8 @@ class CreateSuvatFlashcard(QMainWindow, ui):
                 svt[i] = ''
 
         print(f' graphing {suvat = }, {svt = }')
-        try:
-            graph_main_suvat(suvat, svt, h)
-
-        except Exception:
+        message = graph_main_suvat(suvat, svt, h)
+        if not message:
             self.box.setWindowTitle('Input Error')
             self.box.setIcon(QMessageBox.Critical)
             self.box.setText('Not enough information to plot the graph')
@@ -548,4 +546,3 @@ class CreateSuvatFlashcard(QMainWindow, ui):
             self.box.setDefaultButton(QMessageBox.Ok)
             self.box.exec()
 
-    # todo also make a back button that goes back to hw screen
