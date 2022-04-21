@@ -187,7 +187,6 @@
 #     def show_class(self):
 #         # set removal of class to false so the function to remove a student is called
 #         self.class_remove = False
-#         # fixme deleting students does not update the table again
 #         rows = [index.row() for index in self.table.selectedIndexes()]
 #         # take the classid value in the table from the selected rows
 #         self.classid = int(self.table.item(int(rows[0]), 0).text())
