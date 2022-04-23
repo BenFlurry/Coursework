@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from data import Data
 import math
 
+
 # VERTICAL COMPONENT
 # 1: s = ut + 0.5at^2
 def suat(s, u, a, t, to_be_found):
@@ -20,6 +21,7 @@ def suat(s, u, a, t, to_be_found):
         return found,
 
     # todo handle NaN
+
 
 # 2: s = vt - 0.5at^2
 def svat(s, v, a, t, to_be_found):
@@ -206,6 +208,20 @@ def para_vel_angle_arr(velocity, angle, acceleration, height):
     return para_create_coords_lists(uy, ay, vx, height)
 
 
+# makes graphs look nice
+def style_graphs():
+    # annotate() -> annotate a point x,y with text. might have to convert to numpy array to then find max etc.
+    plt.xlabel('Horizontal Displacement (m)')
+    plt.ylabel('Vertical Displacement (m)')
+    plt.grid(True)
+    plt.axis('equal')
+    plt.axhline(y=0, color='black', linestyle='-')
+    plt.axvline(x=0, color='black', linestyle='-')
+    plt.gca().set_aspect("equal")
+    # hlines() -> add horizontal lines from xmin to xmax (get a reference of scale)
+    # axis() -> set to on to add x and y axis
+
+
 def find_variables(suvat, svt, h):
     try:
         # get suvat svt masks
@@ -284,6 +300,7 @@ def graph_main_suvat(values_suvat, values_svt, start_height):
     if not svt_other:
         coords = para_hor_ver_arr(suvat, svt, h)
         plt.plot(coords[0], coords[1])
+        style_graphs()
         plt.show()
         return True
     else:
@@ -291,6 +308,7 @@ def graph_main_suvat(values_suvat, values_svt, start_height):
         coords2 = para_hor_ver_arr(suvat, svt_other, h)
         plt.plot(*coords1)
         plt.plot(*coords2)
+        style_graphs()
         plt.show()
         return True
 
@@ -298,7 +316,8 @@ def graph_main_suvat(values_suvat, values_svt, start_height):
 # equation to take in x, velocity angle, acceleration and start height and return the y value for each x passed in
 def vel_angle_eqn(x, velocity, angle, acceleration, start_height):
     # equation to find y with respect to x
-    y = (np.tan(angle) * x) + ((acceleration * (x ** 2)) / ((2 * (velocity ** 2) * (np.cos(angle) ** 2)) + start_height))
+    y = (np.tan(angle) * x) + (
+                (acceleration * (x ** 2)) / (2 * (velocity ** 2) * (np.cos(angle) ** 2))) + start_height
     return y
 
 
@@ -334,6 +353,7 @@ def graph_main_velangle(velocity, angle, acceleration, start_height, x, y):
         y_coords1 = vel_angle_eqn(x_coords1, velocity, angle1, acceleration, start_height)
         y_coords2 = vel_angle_eqn(x_coords2, velocity, angle2, acceleration, start_height)
         # plot the x and y coordinates and show graph
+        style_graphs()
         plt.plot(x_coords1, y_coords1)
         plt.plot(x_coords2, y_coords2)
         plt.show()
@@ -348,6 +368,7 @@ def graph_main_velangle(velocity, angle, acceleration, start_height, x, y):
         # find the y values respective to x values
         y_coords = vel_angle_eqn(x_coords, velocity, angle, acceleration, start_height)
         # plot the x and y coordinates and show graph
+        style_graphs()
         plt.plot(x_coords, y_coords)
         plt.show()
 
@@ -357,23 +378,15 @@ def find_theta(x, y, velocity, acceleration, start_height):
     # make graph start at (0,0)
     y = y - start_height
     # find abc coefficients of atheta^2 + btheta + c = 0
-    a = ((-acceleration) * (x**2)) / (2 * (velocity**2))
+    a = ((-acceleration) * (x ** 2)) / (2 * (velocity ** 2))
     b = -x
-    c = ((-acceleration) * (x**2)) / (2 * (velocity**2)) + y
+    c = ((-acceleration) * (x ** 2)) / (2 * (velocity ** 2)) + y
     # find tan theta roots
     tan_theta = np.array(np.roots([a, b, c]))
     # convert to degrees from radians and wrap as tuple
     theta = tuple((180 / np.pi) * np.arctan(tan_theta))
     # return theta possibilities
     return theta
-
-
-# makes graphs look nice
-def style_graphs():
-    # annotate() -> annotate a point x,y with text. might have to convert to numpy array to then find max etc.
-    # hlines() -> add horizontal lines from xmin to xmax (get a reference of scale)
-    # axis() -> set to on to add x and y axis
-    pass
 
 
 # round values to 3sf
@@ -596,7 +609,7 @@ def verify_suvat(inp_suvat, inp_svt, height, check_variable, check_value):
         if svt_mask[1] == 1:
             alpha = y - h
             beta = -u * x
-            gamma = -0.5 * x**2 * a
+            gamma = -0.5 * x ** 2 * a
             # find roots
             roots = np.roots([alpha, beta, gamma])
             if roots[0] == check_value[0] and roots[1] == check_value[1] and type(check_value) == tuple:
@@ -676,7 +689,7 @@ def verify_velangle(values, check_variable, check_value):
 
     elif check_variable == 'x':
         angle = angle * np.pi / 180
-        alpha = accel/(2*(vel**2)*(np.cos(angle)**2))
+        alpha = accel / (2 * (vel ** 2) * (np.cos(angle) ** 2))
         beta = np.tan(angle)
         gamma = -y + h
         found_x = np.roots([alpha, beta, gamma])
@@ -690,7 +703,7 @@ def verify_velangle(values, check_variable, check_value):
 
     elif check_variable == 'accel':
         angle = angle * np.pi / 180
-        found_a = (2 * vel**2 * np.cos(angle)**2 * (y - h - (x*np.tan(angle)))) / x**2
+        found_a = (2 * vel ** 2 * np.cos(angle) ** 2 * (y - h - (x * np.tan(angle)))) / x ** 2
         if found_a == check_value:
             return True, found_a
         else:
@@ -698,12 +711,8 @@ def verify_velangle(values, check_variable, check_value):
 
     elif check_variable == 'vel':
         angle = angle * np.pi / 180
-        found_vel = np.sqrt((accel * x**2) / (2 * (np.cos(angle))**2 * (y - h - (x*np.tan(angle)))))
+        found_vel = np.sqrt((accel * x ** 2) / (2 * (np.cos(angle)) ** 2 * (y - h - (x * np.tan(angle)))))
         if found_vel == check_value:
             return True, found_vel
         else:
             return False, found_vel
-
-
-
-

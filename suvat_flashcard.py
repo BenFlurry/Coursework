@@ -18,7 +18,6 @@ add_question -> push button
 question_name -> line edit
 '''
 
-# todo need to handle tuples tuples and more tuples
 
 
 class CreateSuvatFlashcard(QMainWindow, ui):
@@ -40,8 +39,6 @@ class CreateSuvatFlashcard(QMainWindow, ui):
         self.box.buttonClicked.connect(self.handle_box)
         self.graph_allowed = False
         self.data = Data()
-
-
 
         self.variable_dict = {'Vertical Displacement': 'sy',
                               'Vertical Initial Velocity': 'uy',

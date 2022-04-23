@@ -3,7 +3,7 @@ from functools import partial
 from PyQt5.QtWidgets import QMainWindow, QLineEdit, QStackedWidget
 import sys
 from PyQt5 import uic
-from teacher_landing import TeacherLanding
+# from teacher_landing import TeacherLanding
 from suvatcalculator import CalculateSuvatWindow
 from velanglecalculator import CalculateVelAngleWindow
 from login_screen import LoginScreen
