@@ -70,8 +70,6 @@ class CreateSuvatFlashcard(QMainWindow, ui):
 
         message = ''
         valid_input = True
-        # todo copy this into the suvat sim screen
-        # todo handle tuple inputs
         if self.inp_check_variable.currentText() != 'Choose Target Variable':
             try:
                 # set the check variable
@@ -265,6 +263,7 @@ class CreateSuvatFlashcard(QMainWindow, ui):
         # if the user wants to change the value of the answer to the calculated answer
 
         if button_name == "&Yes" and self.status == 'saving':
+            print('finalising')
             self.finalise()
 
         elif button_name == '&Yes' and self.status == 'checking' or self.calculated_val[0] is True:
@@ -467,42 +466,47 @@ class CreateSuvatFlashcard(QMainWindow, ui):
         # insert values into SQL
         try:
             if flashcard_name != '':
-                # insert into the flashcard table
-                insert = '''INSERT INTO flashcards VALUES (null, ?, ?, ?)'''
-                setid = data_dict['setid']
-                self.c.execute(insert, (flashcard_name, setid, 'suvat'))
+                print('heree')
+                self.c.execute('SELECT name FROM flashcards WHERE name = ?', (flashcard_name,))
+                names = self.c.fetchall()
+                print(f'{names = }')
+                if not names:
+                    # insert into the flashcard table
+                    insert = '''INSERT INTO flashcards VALUES (null, ?, ?, ?)'''
+                    setid = data_dict['setid']
+                    self.c.execute(insert, (flashcard_name, setid, 'suvat'))
 
-                # get the flashcard id
-                select = '''SELECT MAX(flashcardid) 
-                FROM flashcards 
-                WHERE name = ?'''
-                self.c.execute(select, (flashcard_name,))
-                flashcard_id = self.c.fetchall()[0][0]
+                    # get the flashcard id
+                    select = '''SELECT MAX(flashcardid) 
+                    FROM flashcards 
+                    WHERE name = ?'''
+                    self.c.execute(select, (flashcard_name,))
+                    flashcard_id = self.c.fetchall()[0][0]
 
-                # so we can add the flashcard id, and the values to the suvat values table
-                insert = f'''INSERT INTO suvatcards
-                VALUES (null{', ?' * 13}) '''
-                # un-tuple the answer, so it can be added as 2 values in the table
-                if len(self.calculated_val[1]) == 1:
-                    answer = (str(self.calculated_val[1][0]), '')
+                    # so we can add the flashcard id, and the values to the suvat values table
+                    insert = f'''INSERT INTO suvatcards
+                    VALUES (null{', ?' * 13}) '''
+                    # un-tuple the answer, so it can be added as 2 values in the table
+                    if len(self.calculated_val[1]) == 1:
+                        answer = (str(self.calculated_val[1][0]), '')
+                    else:
+                        answer = (str(self.calculated_val[1][0]),
+                                  str(self.calculated_val[1][1]))
+
+                    self.c.execute(insert, (flashcard_id,
+                                            *values,
+                                            int(self.graph_allowed),
+                                            self.check_var,
+                                            answer[0],
+                                            answer[1]))
+
                 else:
-                    answer = (str(self.calculated_val[1][0]),
-                              str(self.calculated_val[1][1]))
-
-                self.c.execute(insert, (flashcard_id,
-                                        *values,
-                                        int(self.graph_allowed),
-                                        self.check_var,
-                                        answer[0],
-                                        answer[1]))
-
-            else:
-                self.box.setWindowTitle('Invalid Entry')
-                self.box.setText('Enter a question name')
-                self.box.setInformativeText('')
-                self.box.setStandardButtons(QMessageBox.Ok)
-                self.box.setDefaultButton(QMessageBox.Ok)
-                self.box.exec()
+                    self.box.setWindowTitle('Invalid Entry')
+                    self.box.setText('Enter a question name')
+                    self.box.setInformativeText('')
+                    self.box.setStandardButtons(QMessageBox.Ok)
+                    self.box.setDefaultButton(QMessageBox.Ok)
+                    self.box.exec()
 
         except Exception as e:
             print(f'exception: {e}')

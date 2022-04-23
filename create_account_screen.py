@@ -43,6 +43,7 @@ class CreateAccountScreen(QMainWindow, ui):
 
     # make sure that the account is valid
     def validate_account(self):
+        self.details = {}
         # pull values from PyQt5
         # self.student = self.qstudent.isChecked()
         # self.teacher = self.qteacher.isChecked()
@@ -142,11 +143,16 @@ class CreateAccountScreen(QMainWindow, ui):
 
     def add_user(self):
         try:
-            query = 'INSERT INTO users VALUES(null, :username, :email, ' \
-                    ':password, :name)'
-            print(self.details)
-            self.c.execute(query, self.details)
-            print('new user account created')
+            valid = True
+            print(self.details['username'] == '')
+            if self.details['email'] == '' or self.details['username'] == '':
+                print('invalid')
+                valid = False
+            else:
+                query = 'INSERT INTO users VALUES(null, :username, :email, ' \
+                        ':password, :name)'
+                print(self.details)
+                self.c.execute(query, self.details)
             # fetch the userid from the created account
             # self.c.execute('SELECT userid FROM users WHERE username = ?', (self.details['username'],))
             # userid = self.c.fetchall()[0][0]
@@ -157,17 +163,27 @@ class CreateAccountScreen(QMainWindow, ui):
             # elif self.account_type == 'student':
             #     # and add to students table if a student
             #     self.c.execute('INSERT INTO students VALUES(null, ?, null)', (userid,))
-            self.box.setWindowTitle('Error')
-            self.box.setText('Continue to sign in')
-            self.box.setIcon(QMessageBox.Information)
-            self.box.setStandardButtons(QMessageBox.Yes)
-            self.box.setDefaultButton(QMessageBox.Yes)
-            self.box.exec()
+            if valid:
+                print('new user account created')
+                self.box.setWindowTitle('Continue')
+                self.box.setText('Continue to sign in')
+                self.box.setIcon(QMessageBox.Information)
+                self.box.setInformativeText('')
+                self.box.setStandardButtons(QMessageBox.Yes)
+                self.box.setDefaultButton(QMessageBox.Yes)
+                self.box.exec()
+
+            else:
+                self.box.setText('enter an email and a username')
+                self.box.setInformativeText('')
+                self.box.setStandardButton(QMessageBox.Ok)
+                self.box.setDefaultButton(QMessageBox.Ok)
+                self.box.exec()
 
         except sqlite3.IntegrityError as e:
             self.box.setWindowTitle('Error')
             self.box.setText('Your username or email already exists')
-            self.box.setInformativeText(str(e))
+            self.box.setInformativeText('')
             self.box.setIcon(QMessageBox.Critical)
             self.box.setStandardButtons(QMessageBox.Ok)
             self.box.setDefaultButton(QMessageBox.Ok)

@@ -60,6 +60,7 @@ class PracticeSuvatFlashcards(QMainWindow, ui):
                         inner join sets 
                         on flashcards.setid = sets.setid
                         where sets.setcode = ?
+                        group by name
                 '''
         self.c.execute(select, (data_dict['setcode'],))
         self.flashcards_pulled = self.c.fetchall()
